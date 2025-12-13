@@ -9,7 +9,18 @@ class Database {
     private $connection;
     
     private function __construct() {
-        require_once __DIR__ . '/../config/config.php';
+        // Use absolute path to config file
+        $configPath = __DIR__ . '/../../config/config.php';
+        if (!file_exists($configPath)) {
+            // Fallback to alternative path
+            $configPath = dirname(dirname(__DIR__)) . '/config/config.php';
+        }
+        
+        if (file_exists($configPath)) {
+            require_once $configPath;
+        } else {
+            die("Configuration file not found at: " . $configPath);
+        }
         
         try {
             $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
