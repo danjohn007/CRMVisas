@@ -8,8 +8,6 @@
     # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
     
     # Prevent access to hidden files and directories
-    RewriteCond %{SCRIPT_FILENAME} -d [OR]
-    RewriteCond %{SCRIPT_FILENAME} -f
     RewriteRule "(^|/)\." - [F]
     
     # Prevent direct access to sensitive files
