@@ -14,9 +14,10 @@ define('DB_CHARSET', 'utf8mb4');
 // Timezone
 date_default_timezone_set('America/Mexico_City');
 
-// Error reporting (set to 0 in production)
+// Error reporting (disable in production)
+// For production, set: error_reporting(0); ini_set('display_errors', 0);
 error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 1); // Change to 0 in production
 
 // Session configuration
 ini_set('session.cookie_httponly', 1);
@@ -30,7 +31,9 @@ define('UPLOAD_MAX_SIZE', 10485760); // 10MB in bytes
 define('ALLOWED_EXTENSIONS', ['pdf', 'jpg', 'jpeg', 'png', 'doc', 'docx']);
 
 // Encryption key for sensitive data
-define('ENCRYPTION_KEY', 'change-this-key-in-production-to-random-string');
+// IMPORTANT: Generate a secure random key for production using:
+// php -r "echo bin2hex(random_bytes(32));"
+define('ENCRYPTION_KEY', getenv('ENCRYPTION_KEY') ?: 'CHANGE-THIS-TO-SECURE-RANDOM-KEY-IN-PRODUCTION');
 
 return [
     'db' => [

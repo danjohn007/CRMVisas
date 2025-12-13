@@ -192,6 +192,12 @@ URL: `http://tu-servidor/public/index.php?page=login`
 | asesor1 | password123 | Asesor |
 | asesor2 | password123 | Asesor |
 
+⚠️ **IMPORTANTE - SEGURIDAD:** 
+- Estas son credenciales de DEMO únicamente
+- **DEBE** cambiar todas las contraseñas antes de usar en producción
+- Para cambiar contraseñas, acceda como admin a: Usuarios → Editar Usuario
+- Considere eliminar usuarios de prueba y crear nuevos con contraseñas seguras
+
 ## 🗂️ Estructura del Proyecto
 
 ```
@@ -271,6 +277,19 @@ El sistema implementa múltiples capas de seguridad:
 5. **Control de Acceso:** Basado en roles (RBAC)
 6. **Auditoría:** Log completo de todas las acciones
 7. **Sesiones:** Configuradas de forma segura
+
+### ⚠️ Checklist de Seguridad para Producción
+
+Antes de desplegar en producción, **DEBE**:
+
+- [ ] Cambiar todas las contraseñas de usuarios por defecto
+- [ ] Generar nueva clave de encriptación en `config/config.php`
+- [ ] Deshabilitar error reporting (`error_reporting(0)` y `display_errors = 0`)
+- [ ] Configurar HTTPS/SSL (habilitar en config/config.php línea 15)
+- [ ] Cambiar credenciales de base de datos
+- [ ] Revisar permisos de archivos (755 para directorios, 644 para archivos)
+- [ ] Configurar respaldos automáticos de base de datos
+- [ ] Revisar configuración de `.htaccess` según su servidor
 
 ## 📱 Características Destacadas
 

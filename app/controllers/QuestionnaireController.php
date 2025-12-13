@@ -14,6 +14,12 @@ class QuestionnaireController extends BaseController {
     }
     
     public function show($token) {
+        // Validate token format
+        if (empty($token) || !preg_match('/^[a-zA-Z0-9]+$/', $token)) {
+            $this->showError('Token inválido');
+            return;
+        }
+        
         // Validate token
         $stmt = $this->db->prepare("
             SELECT pfl.*, sr.id as request_id, sr.request_number, sr.client_id, sr.service_id,
@@ -29,19 +35,19 @@ class QuestionnaireController extends BaseController {
         $link = $stmt->fetch();
         
         if (!$link) {
-            echo "Enlace inválido o expirado";
+            $this->showError('Enlace inválido o expirado');
             return;
         }
         
         // Check if expired
         if ($link['expires_at'] && strtotime($link['expires_at']) < time()) {
-            echo "Este enlace ha expirado";
+            $this->showError('Este enlace ha expirado');
             return;
         }
         
         // Check submission count
         if ($link['submission_count'] >= $link['max_submissions']) {
-            echo "Este cuestionario ya ha sido completado";
+            $this->showError('Este cuestionario ya ha sido completado');
             return;
         }
         
@@ -108,5 +114,24 @@ class QuestionnaireController extends BaseController {
             'success' => $success ?? false,
             'error' => $error ?? null
         ]);
+    }
+    
+    private function showError($message) {
+        echo '<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - CRM Visas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-lg p-8 max-w-md text-center">
+        <div class="text-red-600 text-6xl mb-4">⚠️</div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Error</h1>
+        <p class="text-gray-600">' . htmlspecialchars($message) . '</p>
+    </div>
+</body>
+</html>';
     }
 }

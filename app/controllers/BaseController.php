@@ -54,7 +54,8 @@ class BaseController {
         }
         
         if (!in_array($_SESSION['role'], $allowedRoles)) {
-            $this->redirect(BASE_URL . '/public/index.php?page=unauthorized');
+            $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
+            $this->redirect(BASE_URL . '/public/index.php?page=dashboard');
         }
     }
     

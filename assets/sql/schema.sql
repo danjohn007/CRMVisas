@@ -491,6 +491,9 @@ CREATE TABLE `calendar_events` (
 -- ============================================
 
 -- Usuario administrador por defecto
+-- ⚠️ SEGURIDAD: Estas contraseñas son para DEMO únicamente
+-- Password para todos: password123 (¡CAMBIAR EN PRODUCCIÓN!)
+-- Para producción, elimine estos usuarios o cambie las contraseñas inmediatamente
 INSERT INTO `users` (`username`, `email`, `password`, `full_name`, `role`, `phone`, `status`) VALUES
 ('admin', 'admin@crmvisas.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrador Sistema', 'admin', '4421234567', 'active'),
 ('supervisor1', 'supervisor@crmvisas.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'María García Supervisor', 'supervisor', '4429876543', 'active'),
