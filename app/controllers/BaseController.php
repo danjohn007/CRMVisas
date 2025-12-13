@@ -8,7 +8,10 @@ class BaseController {
     protected $db;
     
     public function __construct() {
-        session_start();
+        // Start session only if not already started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
         require_once APP_PATH . '/models/Database.php';
         $this->db = Database::getInstance()->getConnection();
     }
