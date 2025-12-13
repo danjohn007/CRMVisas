@@ -6,9 +6,9 @@
 
 // Database configuration
 define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-define('DB_NAME', 'crm_visas');
+define('DB_USER', 'tramitev_intranet');
+define('DB_PASS', 'Danjohn007!');
+define('DB_NAME', 'tramitev_intranet');
 define('DB_CHARSET', 'utf8mb4');
 
 // Timezone
