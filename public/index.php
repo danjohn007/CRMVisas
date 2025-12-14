@@ -196,6 +196,31 @@ switch ($page) {
         }
         break;
         
+    case 'notifications':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $controller = new NotificationController();
+        if (isset($_GET['action'])) {
+            switch ($_GET['action']) {
+                case 'get':
+                    $controller->getNotifications();
+                    break;
+                case 'count':
+                    $controller->getUnreadCount();
+                    break;
+                case 'markRead':
+                    $controller->markAsRead();
+                    break;
+                case 'markAllRead':
+                    $controller->markAllAsRead();
+                    break;
+                default:
+                    $controller->getNotifications();
+            }
+        } else {
+            $controller->getNotifications();
+        }
+        break;
+        
     default:
         if (isset($_SESSION['user_id'])) {
             header('Location: ' . BASE_URL . '/public/index.php?page=dashboard');
