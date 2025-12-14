@@ -52,7 +52,7 @@ class RequestController extends BaseController {
         ]);
     }
     
-    public function view($id) {
+    public function detail($id) {
         if (!$id) {
             $_SESSION['error'] = 'ID de solicitud no válido';
             $this->redirect(BASE_URL . '/public/index.php?page=requests');
