@@ -242,7 +242,8 @@
                 return;
             }
             
-            notificationList.innerHTML = notifications.map(notif => {
+            notificationList.innerHTML = '';
+            notifications.forEach(notif => {
                 const isUnread = notif.is_read == 0;
                 const date = new Date(notif.created_at);
                 const formattedDate = date.toLocaleDateString('es-ES', { 
@@ -253,19 +254,38 @@
                     minute: '2-digit'
                 });
                 
-                return `
-                    <div class="p-3 hover:bg-gray-50 ${isUnread ? 'bg-blue-50' : ''} cursor-pointer" 
-                         onclick="handleNotificationClick(${notif.id}, '${notif.link || ''}')" 
-                         data-notification-id="${notif.id}">
-                        <div class="flex items-start justify-between mb-1">
-                            <h4 class="text-sm font-medium text-gray-800 ${isUnread ? 'font-bold' : ''}">${notif.title}</h4>
-                            ${isUnread ? '<span class="w-2 h-2 bg-blue-600 rounded-full"></span>' : ''}
-                        </div>
-                        <p class="text-xs text-gray-600 mb-1">${notif.message}</p>
-                        <span class="text-xs text-gray-400">${formattedDate}</span>
-                    </div>
-                `;
-            }).join('');
+                const notifDiv = document.createElement('div');
+                notifDiv.className = `p-3 hover:bg-gray-50 ${isUnread ? 'bg-blue-50' : ''} cursor-pointer`;
+                notifDiv.setAttribute('data-notification-id', notif.id);
+                notifDiv.onclick = () => handleNotificationClick(notif.id, notif.link || '');
+                
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'flex items-start justify-between mb-1';
+                
+                const titleH4 = document.createElement('h4');
+                titleH4.className = `text-sm font-medium text-gray-800 ${isUnread ? 'font-bold' : ''}`;
+                titleH4.textContent = notif.title;
+                headerDiv.appendChild(titleH4);
+                
+                if (isUnread) {
+                    const badge = document.createElement('span');
+                    badge.className = 'w-2 h-2 bg-blue-600 rounded-full';
+                    headerDiv.appendChild(badge);
+                }
+                
+                const messageP = document.createElement('p');
+                messageP.className = 'text-xs text-gray-600 mb-1';
+                messageP.textContent = notif.message;
+                
+                const dateSpan = document.createElement('span');
+                dateSpan.className = 'text-xs text-gray-400';
+                dateSpan.textContent = formattedDate;
+                
+                notifDiv.appendChild(headerDiv);
+                notifDiv.appendChild(messageP);
+                notifDiv.appendChild(dateSpan);
+                notificationList.appendChild(notifDiv);
+            });
         }
         
         // Handle notification click

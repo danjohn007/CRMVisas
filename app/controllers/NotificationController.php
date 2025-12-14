@@ -19,8 +19,13 @@ class NotificationController extends BaseController {
         $userId = $_SESSION['user_id'];
         $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
         
+        // Validate limit bounds
+        if ($limit < 1) $limit = 1;
+        if ($limit > 100) $limit = 100;
+        
         $stmt = $this->db->prepare("
-            SELECT * FROM notifications 
+            SELECT id, title, message, type, link, is_read, created_at 
+            FROM notifications 
             WHERE user_id = ? 
             ORDER BY created_at DESC 
             LIMIT ?
