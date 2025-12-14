@@ -93,19 +93,19 @@
                 <?php endif; ?>
             </nav>
 
-            <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-50 border-t">
-                <div class="flex items-center space-x-3 mb-3">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-user text-blue-600"></i>
+            <div class="absolute bottom-0 left-0 right-0 p-3 bg-gray-50 border-t">
+                <div class="flex items-center space-x-2 mb-2">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-blue-600 text-sm"></i>
                     </div>
                     <div class="flex-1">
-                        <p class="text-sm font-semibold text-gray-800"><?php echo $_SESSION['full_name']; ?></p>
+                        <p class="text-xs font-semibold text-gray-800"><?php echo $_SESSION['full_name']; ?></p>
                         <p class="text-xs text-gray-600 capitalize"><?php echo $_SESSION['role']; ?></p>
                     </div>
                 </div>
                 <a href="<?php echo BASE_URL; ?>/public/index.php?page=logout" 
-                   class="flex items-center justify-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition">
-                    <i class="fas fa-sign-out-alt"></i>
+                   class="flex items-center justify-center space-x-1 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs transition">
+                    <i class="fas fa-sign-out-alt text-xs"></i>
                     <span>Cerrar Sesión</span>
                 </a>
             </div>
