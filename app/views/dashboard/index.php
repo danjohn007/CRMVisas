@@ -122,7 +122,10 @@ ob_start();
         </div>
         <div class="p-6">
             <?php if (empty($pendingTasks)): ?>
-                <p class="text-gray-500 text-center py-8">No hay tareas pendientes</p>
+                <p class="text-gray-500 text-center py-8">
+                    <i class="fas fa-check-circle text-4xl text-green-400 mb-2"></i><br>
+                    ¡Todo al día! No hay tareas pendientes.
+                </p>
             <?php else: ?>
                 <div class="space-y-4">
                     <?php foreach ($pendingTasks as $task): ?>
@@ -141,11 +144,6 @@ ob_start();
                         </div>
                     <?php endforeach; ?>
                 </div>
-            <?php else: ?>
-                <p class="text-gray-500 text-center py-8">
-                    <i class="fas fa-check-circle text-4xl text-green-400 mb-2"></i><br>
-                    ¡Todo al día! No hay tareas pendientes.
-                </p>
             <?php endif; ?>
         </div>
     </div>
