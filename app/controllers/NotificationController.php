@@ -26,11 +26,13 @@ class NotificationController extends BaseController {
         $stmt = $this->db->prepare("
             SELECT id, title, message, type, link, is_read, created_at 
             FROM notifications 
-            WHERE user_id = ? 
+            WHERE user_id = :user_id 
             ORDER BY created_at DESC 
-            LIMIT ?
+            LIMIT :limit
         ");
-        $stmt->execute([$userId, $limit]);
+        $stmt->bindValue(':user_id', $userId, PDO::PARAM_INT);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
         $notifications = $stmt->fetchAll();
         
         header('Content-Type: application/json');
