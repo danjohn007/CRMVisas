@@ -61,7 +61,7 @@ switch ($page) {
                     $controller->edit($_GET['id'] ?? null);
                     break;
                 case 'view':
-                    $controller->view($_GET['id'] ?? null);
+                    $controller->detail($_GET['id'] ?? null);
                     break;
                 case 'delete':
                     $controller->delete($_GET['id'] ?? null);
@@ -86,7 +86,7 @@ switch ($page) {
                     $controller->edit($_GET['id'] ?? null);
                     break;
                 case 'view':
-                    $controller->view($_GET['id'] ?? null);
+                    $controller->detail($_GET['id'] ?? null);
                     break;
                 default:
                     $controller->index();
@@ -108,7 +108,7 @@ switch ($page) {
                     $controller->edit($_GET['id'] ?? null);
                     break;
                 case 'view':
-                    $controller->view($_GET['id'] ?? null);
+                    $controller->detail($_GET['id'] ?? null);
                     break;
                 default:
                     $controller->index();
@@ -127,7 +127,7 @@ switch ($page) {
                     $controller->create($_GET['request_id'] ?? null);
                     break;
                 case 'view':
-                    $controller->view($_GET['id'] ?? null);
+                    $controller->detail($_GET['id'] ?? null);
                     break;
                 default:
                     $controller->index();

@@ -46,7 +46,7 @@ class ClientController extends BaseController {
         ]);
     }
     
-    public function view($id) {
+    public function detail($id) {
         if (!$id) {
             $_SESSION['error'] = 'ID de cliente no válido';
             $this->redirect(BASE_URL . '/public/index.php?page=clients');

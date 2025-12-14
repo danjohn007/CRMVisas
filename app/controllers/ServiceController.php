@@ -25,7 +25,7 @@ class ServiceController extends BaseController {
         $this->view('services/index', ['services' => $services]);
     }
     
-    public function view($id) {
+    public function detail($id) {
         if (!$id) {
             $_SESSION['error'] = 'ID de servicio no válido';
             $this->redirect(BASE_URL . '/public/index.php?page=services');

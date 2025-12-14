@@ -41,7 +41,7 @@ class PaymentController extends BaseController {
         ]);
     }
     
-    public function view($id) {
+    public function detail($id) {
         if (!$id) {
             $_SESSION['error'] = 'ID de pago no válido';
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
