@@ -101,7 +101,16 @@ function loadReport() {
 }
 
 function exportReport() {
-    alert('Funcionalidad de exportación en desarrollo');
+    const type = document.getElementById('reportType').value;
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    const format = 'csv';
+    
+    // Build export URL
+    const url = `<?php echo BASE_URL; ?>/public/index.php?page=reports&action=export&type=${type}&start_date=${startDate}&end_date=${endDate}&format=${format}`;
+    
+    // Open in new window to trigger download
+    window.location.href = url;
 }
 
 <?php if ($reportType === 'dashboard' && isset($data['requestsByStatus'])): ?>
