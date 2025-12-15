@@ -25,6 +25,12 @@ ob_start();
             <i class="fas fa-download mr-2"></i>Exportar
         </button>
     </div>
+    
+    <!-- Export warning message (hidden by default) -->
+    <div id="exportWarning" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm hidden">
+        <i class="fas fa-info-circle mr-2"></i>
+        El reporte de Dashboard no se puede exportar. Por favor seleccione otro tipo de reporte (Solicitudes, Financiero o Productividad).
+    </div>
 </div>
 
 <!-- Report Content -->
@@ -102,12 +108,21 @@ function loadReport() {
 
 function exportReport() {
     const type = document.getElementById('reportType').value;
+    const exportWarning = document.getElementById('exportWarning');
     
     // Dashboard cannot be exported
     if (type === 'dashboard') {
-        alert('El reporte de Dashboard no se puede exportar. Por favor seleccione otro tipo de reporte.');
+        // Show warning message
+        exportWarning.classList.remove('hidden');
+        // Hide after 5 seconds
+        setTimeout(() => {
+            exportWarning.classList.add('hidden');
+        }, 5000);
         return;
     }
+    
+    // Hide warning if visible
+    exportWarning.classList.add('hidden');
     
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
@@ -124,6 +139,7 @@ function exportReport() {
 document.addEventListener('DOMContentLoaded', function() {
     const reportType = document.getElementById('reportType');
     const exportBtn = document.getElementById('exportBtn');
+    const exportWarning = document.getElementById('exportWarning');
     
     function updateExportButton() {
         if (reportType.value === 'dashboard') {
@@ -134,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
             exportBtn.disabled = false;
             exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             exportBtn.classList.add('hover:bg-green-700');
+            exportWarning.classList.add('hidden');
         }
     }
     

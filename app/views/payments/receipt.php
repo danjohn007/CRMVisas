@@ -356,13 +356,13 @@
             <button class="btn-print" onclick="window.print()">
                 <i class="fas fa-print"></i> Imprimir Recibo
             </button>
-            <button class="btn-back" onclick="window.close(); window.history.back();">
+            <button class="btn-back" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '<?php echo BASE_URL; ?>/public/index.php?page=payments'; }">
                 <i class="fas fa-arrow-left"></i> Volver
             </button>
         </div>
     </div>
     
-    <!-- Font Awesome for icons in print view -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </body>
 </html>

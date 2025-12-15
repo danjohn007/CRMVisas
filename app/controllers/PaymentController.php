@@ -164,12 +164,7 @@ class PaymentController extends BaseController {
         ]);
     }
     
-    public function receipt($id) {
-        if (!$id) {
-            $_SESSION['error'] = 'ID de pago no válido';
-            $this->redirect(BASE_URL . '/public/index.php?page=payments');
-        }
-        
+    private function getPaymentWithDetails($id) {
         $stmt = $this->db->prepare("
             SELECT p.*, 
                    sr.request_number,
@@ -182,7 +177,16 @@ class PaymentController extends BaseController {
             WHERE p.id = ?
         ");
         $stmt->execute([$id]);
-        $payment = $stmt->fetch();
+        return $stmt->fetch();
+    }
+    
+    public function receipt($id) {
+        if (!$id) {
+            $_SESSION['error'] = 'ID de pago no válido';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        $payment = $this->getPaymentWithDetails($id);
         
         if (!$payment) {
             $_SESSION['error'] = 'Pago no encontrado';
@@ -199,43 +203,15 @@ class PaymentController extends BaseController {
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
         }
         
-        $stmt = $this->db->prepare("
-            SELECT p.*, 
-                   sr.request_number,
-                   c.first_name, c.last_name, c.email,
-                   vs.name as service_name
-            FROM payments p
-            LEFT JOIN service_requests sr ON p.request_id = sr.id
-            LEFT JOIN clients c ON sr.client_id = c.id
-            LEFT JOIN visa_services vs ON sr.service_id = vs.id
-            WHERE p.id = ?
-        ");
-        $stmt->execute([$id]);
-        $payment = $stmt->fetch();
+        $payment = $this->getPaymentWithDetails($id);
         
         if (!$payment) {
             $_SESSION['error'] = 'Pago no encontrado';
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
         }
         
-        // Generate PDF using TCPDF-like approach with HTML
-        $this->generatePDF($payment);
-    }
-    
-    private function generatePDF($payment) {
-        // Set PDF headers
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="recibo_' . $payment['payment_reference'] . '.pdf"');
-        header('Cache-Control: private, max-age=0, must-revalidate');
-        header('Pragma: public');
-        
-        // Use wkhtmltopdf approach or DomPDF
-        // For now, we'll generate HTML that can be saved as PDF by browser
-        // This is a fallback solution that works without external libraries
-        
-        // Redirect to receipt page with a parameter to indicate PDF mode
-        $_SESSION['pdf_mode'] = true;
-        header('Location: ' . BASE_URL . '/public/index.php?page=payments&action=receipt&id=' . $payment['id']);
-        exit;
+        // Redirect to receipt page for browser-based PDF generation
+        // User can use browser's Print to PDF functionality
+        $this->redirect(BASE_URL . '/public/index.php?page=payments&action=receipt&id=' . $id);
     }
 }
