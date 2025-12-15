@@ -47,19 +47,7 @@ class PaymentController extends BaseController {
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
         }
         
-        $stmt = $this->db->prepare("
-            SELECT p.*, 
-                   sr.request_number,
-                   c.first_name, c.last_name, c.email,
-                   vs.name as service_name
-            FROM payments p
-            LEFT JOIN service_requests sr ON p.request_id = sr.id
-            LEFT JOIN clients c ON sr.client_id = c.id
-            LEFT JOIN visa_services vs ON sr.service_id = vs.id
-            WHERE p.id = ?
-        ");
-        $stmt->execute([$id]);
-        $payment = $stmt->fetch();
+        $payment = $this->getPaymentWithDetails($id);
         
         if (!$payment) {
             $_SESSION['error'] = 'Pago no encontrado';
@@ -162,5 +150,62 @@ class PaymentController extends BaseController {
             'request' => $request,
             'requests' => $requests
         ]);
+    }
+    
+    private function getPaymentWithDetails($id) {
+        $stmt = $this->db->prepare("
+            SELECT p.*, 
+                   sr.request_number,
+                   c.first_name, c.last_name, c.email,
+                   vs.name as service_name
+            FROM payments p
+            LEFT JOIN service_requests sr ON p.request_id = sr.id
+            LEFT JOIN clients c ON sr.client_id = c.id
+            LEFT JOIN visa_services vs ON sr.service_id = vs.id
+            WHERE p.id = ?
+        ");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    }
+    
+    public function receipt($id) {
+        if (!$id) {
+            $_SESSION['error'] = 'ID de pago no válido';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        $payment = $this->getPaymentWithDetails($id);
+        
+        if (!$payment) {
+            $_SESSION['error'] = 'Pago no encontrado';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        // Render receipt view without main layout
+        require __DIR__ . '/../views/payments/receipt.php';
+    }
+    
+    public function pdf($id) {
+        if (!$id) {
+            $_SESSION['error'] = 'ID de pago no válido';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        // Validate that ID is numeric
+        if (!is_numeric($id)) {
+            $_SESSION['error'] = 'ID de pago no válido';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        $payment = $this->getPaymentWithDetails($id);
+        
+        if (!$payment) {
+            $_SESSION['error'] = 'Pago no encontrado';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
+        // Redirect to receipt page for browser-based PDF generation
+        // User can use browser's Print to PDF functionality
+        $this->redirect(BASE_URL . '/public/index.php?page=payments&action=receipt&id=' . intval($id));
     }
 }

@@ -174,15 +174,24 @@ ob_start();
             <i class="fas fa-file-export mr-2"></i>Acciones
         </h3>
         <div class="flex space-x-3">
-            <button onclick="window.print()" 
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition">
+            <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=receipt&id=<?php echo $payment['id']; ?>" 
+               target="_blank"
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition inline-block"
+               aria-label="Imprimir recibo de pago">
                 <i class="fas fa-print mr-2"></i>Imprimir Recibo
-            </button>
-            <button onclick="alert('Funcionalidad de PDF próximamente')" 
-                    class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition">
+            </a>
+            <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=pdf&id=<?php echo $payment['id']; ?>" 
+               target="_blank"
+               class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition inline-block"
+               title="Abrir recibo y usar 'Imprimir como PDF' en el navegador"
+               aria-label="Exportar recibo a PDF usando la función imprimir del navegador">
                 <i class="fas fa-file-pdf mr-2"></i>Exportar PDF
-            </button>
+            </a>
         </div>
+        <p class="text-xs text-gray-500 mt-2">
+            <i class="fas fa-info-circle mr-1"></i>
+            Para guardar como PDF, haga clic en "Exportar PDF" y use la opción "Imprimir" del navegador seleccionando "Guardar como PDF"
+        </p>
     </div>
 
     <!-- Navigation Buttons -->
