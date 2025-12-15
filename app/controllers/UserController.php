@@ -90,6 +90,20 @@ class UserController extends BaseController {
             
             // Only update password if provided
             if (!empty($_POST['password'])) {
+                // Server-side password validation
+                if (strlen($_POST['password']) < 6) {
+                    $_SESSION['error'] = 'La contraseña debe tener al menos 6 caracteres';
+                    $this->view('users/edit', ['user' => $user]);
+                    return;
+                }
+                
+                // Check password confirmation
+                if ($_POST['password'] !== $_POST['password_confirm']) {
+                    $_SESSION['error'] = 'Las contraseñas no coinciden';
+                    $this->view('users/edit', ['user' => $user]);
+                    return;
+                }
+                
                 $data['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             }
             
