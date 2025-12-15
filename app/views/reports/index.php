@@ -21,7 +21,7 @@ ob_start();
             <i class="fas fa-sync-alt mr-2"></i>Generar Reporte
         </button>
         
-        <button id="exportBtn" onclick="exportReport()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
+        <button id="exportBtn" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
             <i class="fas fa-download mr-2"></i>Exportar
         </button>
     </div>
@@ -153,6 +153,9 @@ document.addEventListener('DOMContentLoaded', function() {
             exportWarning.classList.add('hidden');
         }
     }
+    
+    // Add click handler for export button
+    exportBtn.addEventListener('click', exportReport);
     
     reportType.addEventListener('change', updateExportButton);
     updateExportButton(); // Initialize on page load
