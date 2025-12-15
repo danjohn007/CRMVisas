@@ -21,7 +21,7 @@ ob_start();
             <i class="fas fa-sync-alt mr-2"></i>Generar Reporte
         </button>
         
-        <button onclick="exportReport()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+        <button id="exportBtn" onclick="exportReport()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
             <i class="fas fa-download mr-2"></i>Exportar
         </button>
     </div>
@@ -102,6 +102,13 @@ function loadReport() {
 
 function exportReport() {
     const type = document.getElementById('reportType').value;
+    
+    // Dashboard cannot be exported
+    if (type === 'dashboard') {
+        alert('El reporte de Dashboard no se puede exportar. Por favor seleccione otro tipo de reporte.');
+        return;
+    }
+    
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     const format = 'csv';
@@ -112,6 +119,27 @@ function exportReport() {
     // Open in new window to trigger download
     window.location.href = url;
 }
+
+// Update export button state when report type changes
+document.addEventListener('DOMContentLoaded', function() {
+    const reportType = document.getElementById('reportType');
+    const exportBtn = document.getElementById('exportBtn');
+    
+    function updateExportButton() {
+        if (reportType.value === 'dashboard') {
+            exportBtn.disabled = true;
+            exportBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            exportBtn.classList.remove('hover:bg-green-700');
+        } else {
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            exportBtn.classList.add('hover:bg-green-700');
+        }
+    }
+    
+    reportType.addEventListener('change', updateExportButton);
+    updateExportButton(); // Initialize on page load
+});
 
 <?php if ($reportType === 'dashboard' && isset($data['requestsByStatus'])): ?>
 // Status Chart
