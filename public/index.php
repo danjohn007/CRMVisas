@@ -146,7 +146,17 @@ switch ($page) {
     case 'reports':
         require_once __DIR__ . '/../app/controllers/ReportController.php';
         $controller = new ReportController();
-        $controller->index();
+        if (isset($_GET['action'])) {
+            switch ($_GET['action']) {
+                case 'export':
+                    $controller->export();
+                    break;
+                default:
+                    $controller->index();
+            }
+        } else {
+            $controller->index();
+        }
         break;
         
     case 'settings':
