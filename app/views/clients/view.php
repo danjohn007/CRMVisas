@@ -109,13 +109,13 @@ ob_start();
                                 <td class="px-4 py-2 text-sm">
                                     <span class="px-2 py-1 rounded text-xs font-medium
                                         <?php 
-                                        echo match($request['status']) {
+                                        $statusClasses = [
                                             'pending' => 'bg-yellow-100 text-yellow-800',
                                             'in_process' => 'bg-blue-100 text-blue-800',
                                             'completed' => 'bg-green-100 text-green-800',
-                                            'cancelled' => 'bg-red-100 text-red-800',
-                                            default => 'bg-gray-100 text-gray-800'
-                                        };
+                                            'cancelled' => 'bg-red-100 text-red-800'
+                                        ];
+                                        echo $statusClasses[$request['status']] ?? 'bg-gray-100 text-gray-800';
                                         ?>">
                                         <?php echo ucfirst($request['status']); ?>
                                     </span>
