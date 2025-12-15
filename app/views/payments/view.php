@@ -145,13 +145,13 @@ ob_start();
                     <span class="font-semibold">Estado del Pago:</span><br>
                     <span class="inline-block mt-1 px-3 py-1 rounded-full text-sm font-medium
                         <?php 
-                        echo match($payment['payment_status']) {
+                        $statusClasses = [
                             'pending' => 'bg-yellow-100 text-yellow-800',
                             'completed' => 'bg-green-100 text-green-800',
                             'failed' => 'bg-red-100 text-red-800',
-                            'refunded' => 'bg-purple-100 text-purple-800',
-                            default => 'bg-gray-100 text-gray-800'
-                        };
+                            'refunded' => 'bg-purple-100 text-purple-800'
+                        ];
+                        echo $statusClasses[$payment['payment_status']] ?? 'bg-gray-100 text-gray-800';
                         ?>">
                         <?php 
                         $statuses = [

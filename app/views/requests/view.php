@@ -161,12 +161,12 @@ ob_start();
                         <div class="text-right">
                             <span class="px-2 py-1 rounded text-xs font-medium
                                 <?php 
-                                echo match($payment['payment_status']) {
+                                $statusClasses = [
                                     'pending' => 'bg-yellow-100 text-yellow-800',
                                     'completed' => 'bg-green-100 text-green-800',
-                                    'failed' => 'bg-red-100 text-red-800',
-                                    default => 'bg-gray-100 text-gray-800'
-                                };
+                                    'failed' => 'bg-red-100 text-red-800'
+                                ];
+                                echo $statusClasses[$payment['payment_status']] ?? 'bg-gray-100 text-gray-800';
                                 ?>">
                                 <?php echo ucfirst($payment['payment_status']); ?>
                             </span>
