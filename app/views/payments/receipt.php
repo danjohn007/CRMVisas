@@ -311,13 +311,17 @@
                     <?php 
                     $methods = [
                         'cash' => 'Efectivo',
+                        'card' => 'Tarjeta',
                         'credit_card' => 'Tarjeta de Crédito',
                         'debit_card' => 'Tarjeta de Débito',
+                        'transfer' => 'Transferencia',
                         'bank_transfer' => 'Transferencia Bancaria',
                         'paypal' => 'PayPal',
+                        'stripe' => 'Stripe',
                         'other' => 'Otro'
                     ];
-                    echo $methods[$payment['payment_method']] ?? ucfirst($payment['payment_method']);
+                    $paymentMethod = isset($payment['payment_method']) ? $payment['payment_method'] : 'other';
+                    echo isset($methods[$paymentMethod]) ? $methods[$paymentMethod] : ucwords(str_replace('_', ' ', $paymentMethod));
                     ?>
                 </span>
             </div>

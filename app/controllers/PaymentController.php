@@ -191,6 +191,12 @@ class PaymentController extends BaseController {
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
         }
         
+        // Validate that ID is numeric
+        if (!is_numeric($id)) {
+            $_SESSION['error'] = 'ID de pago no válido';
+            $this->redirect(BASE_URL . '/public/index.php?page=payments');
+        }
+        
         $payment = $this->getPaymentWithDetails($id);
         
         if (!$payment) {
@@ -200,6 +206,6 @@ class PaymentController extends BaseController {
         
         // Redirect to receipt page for browser-based PDF generation
         // User can use browser's Print to PDF functionality
-        $this->redirect(BASE_URL . '/public/index.php?page=payments&action=receipt&id=' . $id);
+        $this->redirect(BASE_URL . '/public/index.php?page=payments&action=receipt&id=' . intval($id));
     }
 }

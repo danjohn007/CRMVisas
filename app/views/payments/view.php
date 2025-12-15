@@ -176,13 +176,15 @@ ob_start();
         <div class="flex space-x-3">
             <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=receipt&id=<?php echo $payment['id']; ?>" 
                target="_blank"
-               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition inline-block">
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition inline-block"
+               aria-label="Imprimir recibo de pago">
                 <i class="fas fa-print mr-2"></i>Imprimir Recibo
             </a>
             <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=pdf&id=<?php echo $payment['id']; ?>" 
                target="_blank"
                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition inline-block"
-               title="Abrir recibo y usar 'Imprimir como PDF' en el navegador">
+               title="Abrir recibo y usar 'Imprimir como PDF' en el navegador"
+               aria-label="Exportar recibo a PDF usando la función imprimir del navegador">
                 <i class="fas fa-file-pdf mr-2"></i>Exportar PDF
             </a>
         </div>

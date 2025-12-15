@@ -21,7 +21,10 @@ ob_start();
             <i class="fas fa-sync-alt mr-2"></i>Generar Reporte
         </button>
         
-        <button id="exportBtn" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition">
+        <button id="exportBtn" 
+                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+                aria-label="Exportar reporte a CSV"
+                aria-describedby="exportWarning">
             <i class="fas fa-download mr-2"></i>Exportar
         </button>
     </div>
