@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recibo de Pago - <?php echo htmlspecialchars($payment['payment_reference']); ?></title>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -353,16 +355,29 @@
         </div>
         
         <div class="no-print">
-            <button class="btn-print" onclick="window.print()">
+            <button class="btn-print" id="printBtn">
                 <i class="fas fa-print"></i> Imprimir Recibo
             </button>
-            <button class="btn-back" onclick="if (window.history.length > 1) { window.history.back(); } else { window.location.href = '<?php echo BASE_URL; ?>/public/index.php?page=payments'; }">
+            <button class="btn-back" id="backBtn">
                 <i class="fas fa-arrow-left"></i> Volver
             </button>
         </div>
     </div>
     
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        // Print button handler
+        document.getElementById('printBtn').addEventListener('click', function() {
+            window.print();
+        });
+        
+        // Back button handler
+        document.getElementById('backBtn').addEventListener('click', function() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '<?php echo BASE_URL; ?>/public/index.php?page=payments';
+            }
+        });
+    </script>
 </body>
 </html>

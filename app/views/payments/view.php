@@ -179,7 +179,7 @@ ob_start();
                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition inline-block">
                 <i class="fas fa-print mr-2"></i>Imprimir Recibo
             </a>
-            <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=receipt&id=<?php echo $payment['id']; ?>" 
+            <a href="<?php echo BASE_URL; ?>/public/index.php?page=payments&action=pdf&id=<?php echo $payment['id']; ?>" 
                target="_blank"
                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition inline-block"
                title="Abrir recibo y usar 'Imprimir como PDF' en el navegador">

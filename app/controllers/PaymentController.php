@@ -47,19 +47,7 @@ class PaymentController extends BaseController {
             $this->redirect(BASE_URL . '/public/index.php?page=payments');
         }
         
-        $stmt = $this->db->prepare("
-            SELECT p.*, 
-                   sr.request_number,
-                   c.first_name, c.last_name, c.email,
-                   vs.name as service_name
-            FROM payments p
-            LEFT JOIN service_requests sr ON p.request_id = sr.id
-            LEFT JOIN clients c ON sr.client_id = c.id
-            LEFT JOIN visa_services vs ON sr.service_id = vs.id
-            WHERE p.id = ?
-        ");
-        $stmt->execute([$id]);
-        $payment = $stmt->fetch();
+        $payment = $this->getPaymentWithDetails($id);
         
         if (!$payment) {
             $_SESSION['error'] = 'Pago no encontrado';
