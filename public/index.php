@@ -129,6 +129,12 @@ switch ($page) {
                 case 'view':
                     $controller->detail($_GET['id'] ?? null);
                     break;
+                case 'receipt':
+                    $controller->receipt($_GET['id'] ?? null);
+                    break;
+                case 'pdf':
+                    $controller->pdf($_GET['id'] ?? null);
+                    break;
                 default:
                     $controller->index();
             }

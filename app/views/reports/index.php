@@ -21,9 +21,18 @@ ob_start();
             <i class="fas fa-sync-alt mr-2"></i>Generar Reporte
         </button>
         
-        <button onclick="exportReport()" class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">
+        <button id="exportBtn" 
+                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+                aria-label="Exportar reporte a CSV"
+                aria-describedby="exportWarning">
             <i class="fas fa-download mr-2"></i>Exportar
         </button>
+    </div>
+    
+    <!-- Export warning message (hidden by default) -->
+    <div id="exportWarning" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm hidden">
+        <i class="fas fa-info-circle mr-2"></i>
+        El reporte de Dashboard no se puede exportar. Por favor seleccione otro tipo de reporte (Solicitudes, Financiero o Productividad).
     </div>
 </div>
 
@@ -102,6 +111,22 @@ function loadReport() {
 
 function exportReport() {
     const type = document.getElementById('reportType').value;
+    const exportWarning = document.getElementById('exportWarning');
+    
+    // Dashboard cannot be exported
+    if (type === 'dashboard') {
+        // Show warning message
+        exportWarning.classList.remove('hidden');
+        // Hide after 5 seconds
+        setTimeout(() => {
+            exportWarning.classList.add('hidden');
+        }, 5000);
+        return;
+    }
+    
+    // Hide warning if visible
+    exportWarning.classList.add('hidden');
+    
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
     const format = 'csv';
@@ -112,6 +137,32 @@ function exportReport() {
     // Open in new window to trigger download
     window.location.href = url;
 }
+
+// Update export button state when report type changes
+document.addEventListener('DOMContentLoaded', function() {
+    const reportType = document.getElementById('reportType');
+    const exportBtn = document.getElementById('exportBtn');
+    const exportWarning = document.getElementById('exportWarning');
+    
+    function updateExportButton() {
+        if (reportType.value === 'dashboard') {
+            exportBtn.disabled = true;
+            exportBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            exportBtn.classList.remove('hover:bg-green-700');
+        } else {
+            exportBtn.disabled = false;
+            exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            exportBtn.classList.add('hover:bg-green-700');
+            exportWarning.classList.add('hidden');
+        }
+    }
+    
+    // Add click handler for export button
+    exportBtn.addEventListener('click', exportReport);
+    
+    reportType.addEventListener('change', updateExportButton);
+    updateExportButton(); // Initialize on page load
+});
 
 <?php if ($reportType === 'dashboard' && isset($data['requestsByStatus'])): ?>
 // Status Chart
