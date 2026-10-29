@@ -1,0 +1,133 @@
+CRM VISAS V5.3 - AJUSTES FINALES DE VENTAS, TICKETS Y NOTA DE REMISIÓN
+============================================================================
+
+ASESORA
+-------
+1. Menú:
+   - "Registrar ventas" ahora se llama "Mis ventas".
+
+2. Vista Mis ventas:
+   - "Registrar ventas manuales" ahora se llama "Mis ventas".
+   - "Nueva venta manual" ahora se llama "Nueva venta".
+   - Se eliminó el título "Pago inicial" de ventas rápidas.
+   - Ahora se muestra "Forma de pago".
+   - Se eliminó Referencia / folio de las ventas rápidas.
+   - Se eliminó la carga de comprobante en la venta rápida inicial.
+   - El comprobante administrativo ahora es el ticket generado por el sistema.
+   - Después de registrar una venta rápida, se abre automáticamente el ticket para imprimir.
+   - El ticket se puede volver a abrir desde "Mis ventas".
+
+3. Formato monetario:
+   - Los principales campos de captura financiera muestran importes como:
+     $20,000.00
+   - Al enviar el formulario, el sistema convierte automáticamente el valor
+     a número limpio para guardarlo en MySQL.
+   - Se aplicó a:
+       * ventas rápidas;
+       * abonos;
+       * Hoja de Información;
+       * egresos;
+       * precios del Catálogo Maestro;
+       * costo de formularios;
+       * importes familiares.
+
+4. Ticket para copias, actas y ventas rápidas:
+   - Se genera automáticamente.
+   - Incluye:
+       Folio de venta
+       Fecha
+       Cliente
+       Folio del cliente
+       Asesora
+       Servicio
+       Cantidad
+       Precio unitario
+       Total
+       Total reportado
+       Saldo
+       Efectivo / Terminal / Transferencia
+   - Funciona como comprobante administrativo/ticket de compra.
+   - No es factura ni comprobante fiscal.
+
+GERENCIA
+--------
+5. Control de Ingresos:
+   - Las ventas rápidas muestran "Ver comprobante / ticket de compra".
+   - Gerencia puede revisar el ticket antes de aprobar o rechazar.
+   - Después de aprobada, el ticket continúa disponible en el expediente financiero.
+   - Las ventas formales continúan mostrando los comprobantes adjuntos de
+     Efectivo / Terminal / Transferencia cuando existan.
+
+VENTAS POR QUINCENA
+-------------------
+6. Para Asesora:
+   - Se agregó "Cantidad de citas".
+   - Se agregó "Personas".
+   - Ya NO se muestra el total vendido en dinero.
+   - En la tabla "Ventas del periodo", Cantidad ahora se presenta como "Personas".
+   - Ya NO aparece la columna Total para la asesora.
+   - Horas extra se conserva.
+
+7. Para Gerencia/Admin:
+   - Continúa visible el Total vendido.
+   - Continúa visible el importe por venta.
+   - También ven Citas y Personas.
+
+HOJA DE INFORMACIÓN
+-------------------
+8. Modal responsive:
+   - Se amplió el ancho máximo.
+   - Se agregó alto máximo respecto a la pantalla.
+   - Se agregó scroll interno.
+   - Se adapta a pantallas pequeñas y grandes.
+   - Ya no debe quedar cortada sin posibilidad de bajar.
+
+9. Referencia / folio:
+   - Se eliminó de la Hoja de Información.
+   - Se eliminó de la Nota de Remisión.
+   - Se conserva únicamente donde sigue siendo útil, por ejemplo egresos.
+
+NOTA DE REMISIÓN FORMAL
+-----------------------
+10. La nota que sale después de guardar Hoja de Información ahora tiene DOS hojas.
+
+HOJA 1:
+   - Datos del cliente.
+   - Folio del expediente.
+   - Asesora.
+   - Servicio.
+   - Cantidad.
+   - Precio unitario.
+   - Total.
+   - Total recibido.
+   - Saldo pendiente.
+   - Efectivo / Terminal / Transferencia.
+   - Observaciones.
+   - Sin Referencia / folio.
+
+HOJA 2:
+   - TÉRMINOS Y CONDICIONES DEL SERVICIO.
+   - Contiene los 12 puntos proporcionados.
+   - Al final incluye:
+       NOMBRE Y FIRMA DEL CLIENTE
+       Nombre completo del cliente
+       Firma del cliente
+
+INSTALACIÓN
+-----------
+No requiere SQL adicional.
+
+Si ya tiene instalada la versión anterior:
+1. Hacer respaldo de archivos.
+2. Subir el ZIP de ajuste.
+3. Reemplazar los archivos.
+4. Cerrar sesión y volver a entrar.
+5. Limpiar caché del navegador con Ctrl + F5.
+
+VALIDACIÓN
+----------
+- 66 archivos PHP fueron revisados con php -l.
+- Sin errores de sintaxis PHP.
+- Se verificó la ruta de ticket.
+- Se verificó el acceso de Gerencia al ticket.
+- Se verificó la segunda hoja de Términos y Condiciones.

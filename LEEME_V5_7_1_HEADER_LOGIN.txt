@@ -1,0 +1,14 @@
+CRM VISAS V5.7.1 - AJUSTE VISUAL HEADER Y LOGIN
+
+Cambios:
+1. Header interno:
+   - Se redujo el tamaño del nombre del sistema.
+   - Se aumentó el ancho disponible.
+   - Se eliminó el corte con puntos suspensivos.
+   - Se agregó adaptación para tablet y móvil.
+
+2. Login:
+   - Se redujo el tamaño de la frase:
+     "Gestiona solicitudes, clientes y seguimiento desde un solo lugar."
+
+No requiere cambios en base de datos.

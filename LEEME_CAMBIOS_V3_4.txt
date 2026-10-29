@@ -1,0 +1,9 @@
+CRM VISAS V3.4
+Reemplazar:
+- app/views/auth/login.php
+- app/controllers/WhatsAppController.php
+- app/views/whatsapp/index.php
+- public/uploads/logo-visas-login.png
+
+Login: logo real, sin los dos iconos, credenciales a la derecha.
+Conversaciones: cada asesora ve únicamente su cartera asignada.

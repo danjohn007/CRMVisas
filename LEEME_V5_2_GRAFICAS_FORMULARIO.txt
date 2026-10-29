@@ -1,0 +1,66 @@
+CRM VISAS V5.2 - GRÁFICAS Y AJUSTES DE FORMULARIO
+=====================================================
+
+GRÁFICAS
+--------
+Se agregaron únicamente donde aportan lectura rápida y no estorban el flujo:
+
+1. Balance Semanal
+   - Ingresos vs Egresos.
+   - Distribución de ingresos por Efectivo, Terminal y Transferencia.
+
+2. Resumen Mensual
+   - Cantidad de operaciones por servicio.
+   - Ingresos vs Egresos del mes.
+
+No se agregaron gráficas a Control de Ingresos porque esa pantalla está
+orientada a aprobar/rechazar movimientos y mantenerla simple es más útil.
+
+FORMULARIO ID 41
+----------------
+VISA AMERICANA - PRIMERA VEZ - CON TRASLADO
+
+1. Header
+   - Se agregó el texto solicitado para el cliente.
+   - Se conservó el texto introductorio anterior.
+   - Se quitó el precio del encabezado público del formulario.
+   - El costo sigue existiendo en la base y continúa utilizándose internamente.
+
+2. Datos de viaje
+   - ¿Dónde se hospedará? mantiene Hotel / Familiar-Amistad.
+   - El bloque de dirección/datos se muestra únicamente al elegir Familiar/Amistad.
+   - Si se elige Hotel, ese bloque adicional no se despliega.
+
+3. Quién paga el viaje
+   - Opciones: Yo mism@ / Otra persona.
+   - Si elige Otra persona aparecen nombre completo, parentesco, correo,
+     calle, No. Ext, No. Int, colonia, municipio, ciudad y país.
+   - Si elige Yo mism@, esos campos permanecen ocultos.
+
+4. Negación de visa
+   - Debajo de "Explique el motivo de negación" aparece en negritas:
+     "IMPORTANTE: indique también en qué año le fue negada."
+
+5. Estatus legal
+   - Se actualizó a:
+     "Estatus Legal (ciudadano americano, residente permanente,
+      visa de trabajo o estatus ilegal)"
+   - Se aplicó a los campos equivalentes del hospedante, padre y madre.
+
+INSTALACIÓN
+-----------
+1. Respaldar archivos y base de datos.
+2. Subir/reemplazar los archivos del ZIP V5.2.
+3. Ejecutar una sola vez:
+   database/migrations/13_ajustes_formulario_visa_primera_vez_con_traslado_V5_2.sql
+4. Cerrar sesión y volver a entrar.
+5. Probar el formulario público con una solicitud nueva o enlace vigente.
+
+El SQL crea primero una copia de seguridad del formulario 41 dentro de
+la tabla form_change_backups antes de modificarlo.
+
+No se eliminan formularios, respuestas, solicitudes ni documentos.
+
+AJUSTE V5.2.1
+-------------
+La pregunta "¿Qué lugar de USA visitará?" ahora indica "(Estado y Ciudad)".

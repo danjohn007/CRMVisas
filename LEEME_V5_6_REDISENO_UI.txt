@@ -1,0 +1,31 @@
+CRM VISAS V5.6 - REDISEÑO VISUAL DE LOGIN Y DASHBOARD
+
+Cambios incluidos:
+1. Login rediseñado con enfoque visual más moderno.
+2. Botón/liga para ir a la landing page: https://tramitevisaamericanaqueretaro.com/
+3. Campo de contraseña con opción de mostrar/ocultar.
+4. Eliminación de cualquier enfoque de acceso social en el diseño (solo correo + contraseña + validación humana existente).
+5. Layout general posterior al login renovado:
+   - barra superior más limpia,
+   - menú lateral dinámico y ocultable,
+   - mejor jerarquía visual,
+   - estilo más amigable y profesional.
+6. Dashboard rediseñado:
+   - mensaje de bienvenida,
+   - tarjetas de métricas más visuales,
+   - gráficas más limpias y dinámicas,
+   - tabla de solicitudes recientes mejor presentada,
+   - calendario más agradable visualmente.
+7. Estilos globales mejorados para tablas, paneles, alertas y modales.
+
+Archivos modificados:
+- app/views/auth/login.php
+- app/views/layouts/main.php
+- app/views/dashboard/index.php
+
+Base de datos:
+- NO requiere cambios en BD para este ajuste visual.
+
+Recomendación:
+- Probar en móvil y escritorio.
+- Limpiar caché del navegador si no se reflejan los cambios al primer intento.

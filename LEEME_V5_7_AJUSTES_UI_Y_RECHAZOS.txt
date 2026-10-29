@@ -1,0 +1,77 @@
+CRM VISAS V5.7 - AJUSTES DE INTERFAZ Y VENTAS RECHAZADAS
+==========================================================
+
+LOGIN
+- Se quitó "Bienvenido a tu área de trabajo" del login.
+- Se quitó el párrafo explicativo debajo.
+- El logo queda centrado y más visible.
+- Se quitó "Acceso seguro".
+- Se cambió el mensaje lateral por:
+  "Gestiona solicitudes, clientes y seguimiento desde un solo lugar."
+- Se mantienen correo, contraseña, ver/ocultar contraseña y validación humana.
+- Se mantiene el acceso a la landing page.
+
+HEADER / MENÚ
+- El header usa directamente el logo público del sistema: /logo-visas-login.png.
+- El nombre visible del sistema se cambió a:
+  Tramite Visa Americana En Queretaro By Vanesa Torres
+- Se eliminó el subtítulo del header.
+- Se eliminó del menú lateral:
+  "Interfaz renovada / Más visual, clara y ordenada".
+- El menú lateral sigue siendo ocultable/dinámico.
+
+DASHBOARD
+- Se redujeron textos y párrafos secundarios.
+- Se conservaron sólo métricas, accesos y explicaciones esenciales.
+- Si una asesora tiene ventas rechazadas, aparece un aviso directo en Dashboard.
+
+CONSTRUCTOR DE FORMULARIOS
+- En la columna Nombre ahora sólo se muestra el nombre del formulario.
+- Se quitó la descripción y etiquetas adicionales dentro de esa celda para evitar filas muy altas.
+
+FORMULARIOS PÚBLICOS
+- Todos los formularios muestran en el header el aviso general solicitado:
+  Estimado cliente, recuerde que la responsabilidad...
+  NO DEJAR RESPUESTAS EN BLANCO...
+  LEA LAS PREGUNTAS CUIDADOSAMENTE...
+- Si un formulario ya tenía ese texto dentro de su descripción, se evita duplicarlo.
+- Se conserva la introducción específica de cada formulario.
+
+SOLICITUDES / FORMULARIOS DISPONIBLES
+- Nueva Solicitud continúa mostrando únicamente formularios PUBLICADOS.
+- Los formularios en estado Borrador no se ofrecen a las asesoras.
+- Si sólo aparece ETA Canadiense, revise en Constructor de Formularios cuáles están en estado Publicado.
+- Esto evita iniciar trámites usando cuestionarios todavía incompletos.
+
+VENTAS RECHAZADAS
+- Una venta rechazada ya no desaparece de Mis ventas.
+- La asesora recibe aviso en:
+  * Dashboard.
+  * Contador rojo en el menú "Mis ventas".
+  * La tarjeta de la venta rechazada.
+- Se muestra el motivo escrito por Gerencia.
+- Venta rápida/manual:
+  * botón "Corregir y reenviar";
+  * reutiliza la misma venta y folio;
+  * permite corregir cliente, servicio, cantidad, fecha, pago y observaciones;
+  * regresa a estado PENDIENTE para nueva revisión de Gerencia.
+- Venta formal nacida de Hoja de Información:
+  * muestra motivo del rechazo;
+  * botón para corregir Hoja de Información;
+  * al guardar nuevamente, vuelve a PENDIENTE.
+
+BASE DE DATOS
+- No requiere SQL adicional.
+- Se utilizan columnas que ya existen: approval_status, rejection_reason y financial_status.
+
+ARCHIVOS PRINCIPALES MODIFICADOS
+- config/helpers.php
+- app/controllers/AdvisorIncomeController.php
+- app/views/auth/login.php
+- app/views/layouts/main.php
+- app/views/dashboard/index.php
+- app/views/forms/index.php
+- app/views/public/form.php
+- app/views/advisor-income/index.php
+- app/views/applications/show.php
+- app/views/applications/index.php

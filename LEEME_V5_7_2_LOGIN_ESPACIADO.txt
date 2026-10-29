@@ -1,0 +1,20 @@
+CRM VISAS V5.7.2 - AJUSTE DE LOGO Y ESPACIADO EN LOGIN
+
+Cambios:
+- Logo principal del login aumentado a 190 x 190 px en escritorio.
+- Logo del bloque final aumentado a 82 x 82 px.
+- Mayor espacio entre el título:
+  "Gestiona solicitudes, clientes y seguimiento desde un solo lugar."
+  y los bloques:
+  "Solicitudes y expedientes"
+  "Seguimiento desde WhatsApp"
+  "Indicadores y reportes"
+- Mayor separación entre esos bloques y:
+  "Tramite Visa Americana En Queretaro By Vanesa Torres"
+  "Acceso privado al sistema"
+- Ajustes responsive para móvil.
+
+Archivo modificado:
+- app/views/auth/login.php
+
+No requiere cambios en base de datos.

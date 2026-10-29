@@ -1,0 +1,62 @@
+CRM VISAS V5.9 - SOBRES, TRASLADOS, LOGO Y VANESA
+===================================================
+
+CAMBIOS
+-------
+1. Logo original
+   - Se integró el PNG original proporcionado por el usuario.
+   - Se usa en login y header del sistema.
+   - Archivos:
+     public/logo-visas-original.png
+     public/logo-visas-login.png
+
+2. Nombre Vanesa
+   - Se corrigieron las referencias visibles de Vaneza/Vaneza Torrez a Vanesa Torres.
+   - La migración también actualiza site_name y full_name en usuarios si contienen Vaneza.
+   - NO se modifican identificadores técnicos/URLs de Firebase que contienen "vaneza", porque cambiar esos identificadores rompería el bot.
+
+3. Traslados
+   - Administrador puede eliminar definitivamente un traslado.
+   - La eliminación borra también la lista operativa del traslado por la relación ON DELETE CASCADE.
+   - Se solicita confirmación antes de eliminar.
+   - Cerrar/reabrir continúa funcionando igual.
+
+4. Sobres históricos
+   - Nuevo menú/botón SOBRES, sólo Administrador.
+   - Permite registrar cuánto efectivo existía al cierre de meses anteriores.
+   - Un registro por mes; guardar nuevamente el mismo mes actualiza el importe.
+   - Puede eliminarse un sobre histórico.
+   - Los sobres NO son ingresos y NO crean movimientos financieros.
+   - Son únicamente fotografías del efectivo/ahorro al cierre mensual.
+
+5. Corte automático
+   - Configurado en 01/11/2026.
+   - Meses anteriores: el efectivo/ahorro usa el último sobre histórico capturado.
+   - Desde noviembre 2026: el sistema toma el último sobre previo como saldo de arranque y continúa automáticamente con los movimientos reales de EFECTIVO.
+   - Fórmula a partir del corte:
+       Último sobre histórico + ingresos en efectivo - egresos en efectivo = ahorro acumulado.
+   - Terminal y Transferencia siguen separadas y no forman parte de Sobres.
+
+INSTALACIÓN
+-----------
+1. Respaldar archivos y BD.
+2. Subir CRMVisas_V5_9_Ajuste_Sobres_Traslados_Logo.zip y reemplazar archivos.
+3. Ejecutar una sola vez:
+   database/migrations/15_sobres_historicos_v5_9.sql
+4. Cerrar sesión y volver a entrar.
+5. Ctrl + F5.
+
+PRUEBA SUGERIDA
+---------------
+Administrador > Sobres:
+- Julio 2026: $150,000.00
+- Agosto 2026: $200,000.00
+- Septiembre 2026: $100,000.00
+- Octubre 2026: opcional, si existe un cierre real de ese mes.
+
+Después abrir Resumen mensual y revisar que el ahorro histórico use los sobres sin sumarlos como ingreso.
+A partir de noviembre, revisar que efectivo recibido y egresos modifiquen automáticamente el ahorro acumulado.
+
+SQL
+---
+15_sobres_historicos_v5_9.sql

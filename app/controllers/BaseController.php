@@ -1,112 +1,113 @@
 <?php
-/**
- * Base Controller
- * All controllers extend this class
- */
+require_once ROOT_PATH . '/config/database.php';
 
 class BaseController {
     protected $db;
     
     public function __construct() {
-        // Start session only if not already started
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        require_once APP_PATH . '/models/Database.php';
         $this->db = Database::getInstance()->getConnection();
     }
     
-    protected function view($view, $data = []) {
-        extract($data);
-        $viewFile = APP_PATH . '/views/' . $view . '.php';
-        
-        if (file_exists($viewFile)) {
-            require_once $viewFile;
-        } else {
-            die("View not found: $viewFile");
+    protected function isLoggedIn() {
+        return isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+    }
+    
+    protected function requireLogin() {
+        if (!$this->isLoggedIn()) {
+            header('Location: ' . BASE_URL . '/login');
+            exit;
         }
+
+        $idleTimeoutMinutes = max(1, (int) getConfig('session_idle_timeout_minutes', 30));
+        $lastActivity = (int) ($_SESSION['last_activity'] ?? time());
+
+        if ((time() - $lastActivity) > ($idleTimeoutMinutes * 60)) {
+            $this->expireSessionForInactivity();
+        }
+
+        $_SESSION['last_activity'] = time();
+    }
+    
+    protected function requireRole($allowedRoles) {
+        $this->requireLogin();
+        
+        if (!in_array($_SESSION['user_role'], $allowedRoles)) {
+            http_response_code(403);
+            die("Acceso denegado. No tiene permisos para acceder a esta sección.");
+        }
+    }
+    
+    protected function view($viewName, $data = []) {
+        extract($data);
+        $viewFile = ROOT_PATH . '/app/views/' . $viewName . '.php';
+        
+        if (!file_exists($viewFile)) {
+            die("Vista no encontrada: $viewName");
+        }
+        
+        require_once $viewFile;
     }
     
     protected function json($data, $statusCode = 200) {
         http_response_code($statusCode);
-        header('Content-Type: application/json');
-        echo json_encode($data);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit;
     }
     
     protected function redirect($url) {
-        header('Location: ' . $url);
+        header('Location: ' . BASE_URL . $url);
         exit;
     }
     
-    protected function isLoggedIn() {
-        return isset($_SESSION['user_id']);
+    protected function getUserRole() {
+        return $_SESSION['user_role'] ?? null;
     }
     
-    protected function requireAuth() {
-        if (!$this->isLoggedIn()) {
-            $this->redirect(BASE_URL . '/public/index.php?page=login');
+    protected function canAccessFinancial() {
+        $role = $this->getUserRole();
+        return in_array($role, [ROLE_ADMIN, ROLE_GERENTE]);
+    }
+    
+    protected function canSeeFinalized() {
+        $role = $this->getUserRole();
+        return in_array($role, [ROLE_ADMIN, ROLE_GERENTE]);
+    }
+    
+    protected function canChangeStatus() {
+        $role = $this->getUserRole();
+        return in_array($role, [ROLE_ADMIN, ROLE_GERENTE]);
+    }
+    
+    protected function canManageForms() {
+        return $this->getUserRole() === ROLE_ADMIN;
+    }
+
+    private function expireSessionForInactivity() {
+        if (isset($_SESSION['user_name'])) {
+            logAudit('session_expired', 'autenticacion', "Sesion cerrada por inactividad para: {$_SESSION['user_name']}");
         }
-    }
-    
-    protected function requireRole($allowedRoles) {
-        $this->requireAuth();
-        
-        if (!is_array($allowedRoles)) {
-            $allowedRoles = [$allowedRoles];
+
+        $_SESSION = [];
+
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params['path'],
+                $params['domain'],
+                $params['secure'],
+                $params['httponly']
+            );
         }
-        
-        if (!in_array($_SESSION['role'], $allowedRoles)) {
-            $_SESSION['error'] = 'No tienes permisos para acceder a esta sección';
-            $this->redirect(BASE_URL . '/public/index.php?page=dashboard');
-        }
-    }
-    
-    protected function getCurrentUser() {
-        if ($this->isLoggedIn()) {
-            $stmt = $this->db->prepare("SELECT * FROM users WHERE id = ?");
-            $stmt->execute([$_SESSION['user_id']]);
-            return $stmt->fetch();
-        }
-        return null;
-    }
-    
-    protected function logAudit($action, $tableName = null, $recordId = null, $oldValues = null, $newValues = null) {
-        $stmt = $this->db->prepare("
-            INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address, user_agent)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ");
-        
-        $stmt->execute([
-            $_SESSION['user_id'] ?? null,
-            $action,
-            $tableName,
-            $recordId,
-            $oldValues ? json_encode($oldValues) : null,
-            $newValues ? json_encode($newValues) : null,
-            $_SERVER['REMOTE_ADDR'] ?? null,
-            $_SERVER['HTTP_USER_AGENT'] ?? null
-        ]);
-    }
-    
-    protected function sanitize($data) {
-        if (is_array($data)) {
-            return array_map([$this, 'sanitize'], $data);
-        }
-        return htmlspecialchars(strip_tags(trim($data)), ENT_QUOTES, 'UTF-8');
-    }
-    
-    protected function validateEmail($email) {
-        return filter_var($email, FILTER_VALIDATE_EMAIL);
-    }
-    
-    protected function validateRequired($fields, $data) {
-        $errors = [];
-        foreach ($fields as $field) {
-            if (!isset($data[$field]) || empty(trim($data[$field]))) {
-                $errors[$field] = "El campo es requerido";
-            }
-        }
-        return $errors;
+
+        session_destroy();
+        session_start();
+        $_SESSION['error'] = 'Su sesion expiro por inactividad. Inicie sesion nuevamente.';
+
+        header('Location: ' . BASE_URL . '/login');
+        exit;
     }
 }

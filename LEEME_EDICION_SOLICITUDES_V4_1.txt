@@ -1,0 +1,33 @@
+CRM VISAS V4.1 - EDICIÓN DE INFORMACIÓN EN SOLICITUDES
+========================================================
+
+CAMBIO
+------
+En el detalle de cada Solicitud se agregó el botón "Editar información".
+
+Permite editar:
+- Nombre(s)
+- Apellidos
+- Correo electrónico
+- Teléfono
+- Datos básicos especiales de Pasaporte Americano
+- Tipo / modalidad para Visa Canadiense
+- Respuestas del formulario actual, excepto campos de archivo
+
+REGLAS
+------
+- La asesora sólo puede editar solicitudes de su propia cartera.
+- Una asesora no puede editar una solicitud ya cerrada/finalizada.
+- Gerencia y Administración sí pueden editar solicitudes visibles para su rol.
+- No se modifica el folio, responsable, historial, documentos ni vínculo original con WhatsApp.
+- Si la solicitud provino del bot, el perfilamiento original de WhatsApp se conserva como historial.
+- Si ya existe una venta en Control de Ingresos, un cambio de nombre actualiza también
+  el nombre visible en el expediente financiero.
+- Cada edición queda registrada en auditoría.
+
+INSTALACIÓN
+-----------
+No requiere SQL nuevo.
+
+Puede subir únicamente los archivos del ZIP de ajuste sobre la V4 anterior,
+o utilizar el CRM completo V4.1.

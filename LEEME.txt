@@ -1,0 +1,18 @@
+CRM VISAS - AJUSTE ASIGNACIÓN PERSISTENTE + PLANTILLA META
+
+Reemplazar únicamente:
+- app/controllers/WhatsAppController.php
+- app/controllers/Router.php
+- app/views/whatsapp/index.php
+
+Requiere desplegar también VisasBot V3.2.
+
+Comportamiento:
+- Una asesora que toma un cliente conserva la asignación aunque lo devuelva al bot.
+- El cliente sigue apareciendo en "Mis conversaciones".
+- Puede retomar la atención humana desde su conversación.
+- Puede enviar la plantilla Meta seguimiento_tramite_visas con:
+  {{1}} nombre automático del cliente
+  {{2}} mensaje de seguimiento
+- Administrador conserva visibilidad total.
+- No requiere cambios de base de datos.

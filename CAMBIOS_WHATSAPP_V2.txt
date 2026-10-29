@@ -1,0 +1,11 @@
+CRM VISAS - WHATSAPP V2
+- Nueva bandeja Conversaciones WhatsApp.
+- Administrador: visibilidad de todas las conversaciones e intervenciones.
+- Asesoras: solo conversaciones que pidieron atención y las asignadas a ellas.
+- Botón Tomar conversación con control de asignación.
+- Respuestas humanas registradas con nombre y rol.
+- Botón Devolver al bot.
+- Cierre solo para administrador; nunca elimina historial.
+- No existen rutas ni botones de edición o borrado de conversaciones/mensajes.
+- Panel lateral con perfil de primer contacto y eventos de handoff.
+- Actualización automática de mensajes cada 6 segundos.

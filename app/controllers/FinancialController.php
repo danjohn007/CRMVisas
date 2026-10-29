@@ -1,64 +1,31 @@
 <?php
-/**
- * Financial Controller
- * Manages financial transactions (RF53, RF56, RF58)
- */
+require_once ROOT_PATH . '/app/controllers/BaseController.php';
 
-class FinancialController extends BaseController {
-    
-    public function __construct() {
-        parent::__construct();
-        $this->requireAuth();
-        $this->requireRole(['admin', 'supervisor']);
+class FinancialController extends BaseController
+{
+    public function index()
+    {
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        $this->redirect('/control-ingresos');
     }
-    
-    public function index() {
-        $type = $_GET['type'] ?? '';
-        $startDate = $_GET['start_date'] ?? date('Y-m-01');
-        $endDate = $_GET['end_date'] ?? date('Y-m-t');
-        
-        // Get transactions
-        $sql = "SELECT ft.*, fc.name as category_name, u.full_name as created_by_name
-                FROM financial_transactions ft
-                LEFT JOIN financial_categories fc ON ft.category_id = fc.id
-                LEFT JOIN users u ON ft.created_by = u.id
-                WHERE ft.transaction_date BETWEEN ? AND ?";
-        
-        $params = [$startDate, $endDate];
-        
-        if (!empty($type)) {
-            $sql .= " AND ft.transaction_type = ?";
-            $params[] = $type;
-        }
-        
-        $sql .= " ORDER BY ft.transaction_date DESC";
-        
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute($params);
-        $transactions = $stmt->fetchAll();
-        
-        // Calculate totals
-        $stmt = $this->db->prepare("
-            SELECT 
-                SUM(CASE WHEN transaction_type = 'income' THEN amount ELSE 0 END) as total_income,
-                SUM(CASE WHEN transaction_type = 'expense' THEN amount ELSE 0 END) as total_expense
-            FROM financial_transactions
-            WHERE transaction_date BETWEEN ? AND ?
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        $totals = $stmt->fetch();
-        
-        // Get categories
-        $stmt = $this->db->query("SELECT * FROM financial_categories WHERE status = 'active' ORDER BY name");
-        $categories = $stmt->fetchAll();
-        
-        $this->view('financial/index', [
-            'transactions' => $transactions,
-            'categories' => $categories,
-            'totals' => $totals,
-            'type' => $type,
-            'startDate' => $startDate,
-            'endDate' => $endDate
-        ]);
+
+    public function show($id)
+    {
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        $this->redirect('/solicitudes/ver/' . (int)$id);
+    }
+
+    public function addCost($id)
+    {
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        $_SESSION['error'] = 'El expediente financiero ahora se alimenta desde la venta registrada con el Catálogo Maestro de Ingresos.';
+        $this->redirect('/solicitudes/ver/' . (int)$id);
+    }
+
+    public function registerPayment($id)
+    {
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        $_SESSION['error'] = 'Los abonos se registran desde Control de Ingresos dentro del mismo expediente financiero.';
+        $this->redirect('/solicitudes/ver/' . (int)$id);
     }
 }

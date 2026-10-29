@@ -1,383 +1,342 @@
-# CRM Visas - Sistema de Gestión de Trámites de Visas
+# CRM de Solicitudes de Visas y Pasaportes
 
-Sistema completo de gestión interna (CRM) para el manejo de solicitudes, trámites y seguimiento de visas internacionales. Desarrollado con PHP puro, MySQL y Tailwind CSS.
+Sistema completo de gestión de trámites de Visas y Pasaportes con constructor de formularios dinámicos, control de roles y módulo financiero.
 
 ## 🚀 Características Principales
 
-### Módulos Implementados
+### ✨ Constructor de Formularios Dinámicos
+- Interfaz visual tipo JotForm
+- Múltiples tipos de campos (texto, fecha, archivo, select, etc.)
+- Lógica condicional entre campos
+- Versionado automático de formularios
+- Publicar/Despublicar formularios
 
-#### 1. **Gestión de Clientes** (RF01-RF05)
-- Registro completo de clientes con información personal y de contacto
-- Perfil detallado con historial de trámites
-- Sistema de subida y validación de documentos digitales (PDF, imágenes)
-- Búsqueda avanzada por múltiples criterios
-- Historial completo de interacciones y comunicaciones
+### 👥 Sistema de Roles y Permisos
+- **Administrador**: Control total del sistema
+- **Gerente**: Gestión operativa y financiera
+- **Asesor**: Captura de nuevas solicitudes (sin acceso a finalizadas)
 
-#### 2. **Servicios y Formularios** (RF06-RF11)
-- Configuración de tipos de servicios/visas con parámetros personalizables
-- Editor visual de formularios
-- Definición de campos personalizados por tipo de visa
-- Configuración de validaciones y reglas por campo
-- Plantillas de formularios reutilizables
-- Lógica condicional en formularios
+### 📋 Gestión de Solicitudes
+- Folios únicos automáticos (VISA-YYYY-NNNNNN)
+- Seguimiento completo por estatus
+- Historial detallado de cambios
+- Sistema de documentos con versionado
+- **Regla crítica**: Asesores no ven solicitudes finalizadas
 
-#### 3. **Gestión de Solicitudes** (RF12-RF15)
-- Creación y seguimiento de solicitudes asociando cliente y servicio
-- Dashboard de seguimiento por estado
-- Sistema de notificaciones automáticas
-- Asignación de solicitudes a agentes específicos
-- Historial completo de cambios de estado
+### 💰 Módulo Financiero
+- Registro de costos por solicitud
+- Control de pagos múltiples
+- Estados financieros (Pendiente, Parcial, Pagado)
+- Acceso exclusivo para Admin y Gerente
 
-#### 4. **Proceso de Trámite** (RF16-RF23)
-- Formulario unificado de captura de datos del cliente
-- Generación de enlaces únicos de cuestionarios públicos
-- Formularios responsive accesibles desde dispositivos móviles
-- Guardado automático de progreso
-- Validación en tiempo real
-- Control de expiración de enlaces
+### 📊 Reportes y Dashboard
+- Estadísticas en tiempo real
+- Gráficas interactivas
+- Exportación a Excel, CSV, PDF
+- Dashboard personalizado por rol
 
-#### 5. **Gestión de Pagos** (RF24-RF28)
-- Generación automática de fichas de pago
-- Registro de pagos con múltiples métodos (efectivo, tarjeta, transferencia, PayPal, Stripe)
-- Confirmación y seguimiento de pagos
-- Comprobantes digitales
-- Control de pagos pendientes y vencidos
-
-#### 6. **Revisión Documental y Checklist** (RF38-RF42)
-- Dashboard para revisión de documentación
-- Sistema de checklist por tipo de visa
-- Marcado de documentos (aprobados/rechazados/pendientes)
-- Comentarios y anotaciones en documentos
-- Alertas de documentos faltantes o vencidos
-
-#### 7. **Módulo Financiero** (RF53, RF56, RF58)
-- Control de ingresos y egresos
-- Sistema de comisiones por agente
-- Catálogo de categorías de movimientos
-- Reportes financieros
-
-#### 8. **Sistema de Reportes** (RF47-RF49)
-- Reportes predefinidos (estadísticas, productividad, financieros)
-- Constructor de reportes personalizados
-- Exportación a múltiples formatos
-
-#### 9. **Usuarios y Seguridad** (RF59-RF70)
-- Sistema de roles multi-nivel (Admin, Supervisor, Asesor, Cliente)
-- Autenticación segura con password_hash()
-- Control de acceso basado en roles
-- Registro de auditoría completo
-- Encriptación de datos sensibles
-
-#### 10. **Configuración del Sistema** (RF75, RF77)
-- Nombre del sitio y logotipo
+### ⚙️ Configuración Global
+- Personalización de sitio (nombre, logo)
 - Configuración de correo electrónico
-- Teléfonos de contacto y horarios de atención
-- Personalización de colores del sistema
-- Configuración de PayPal y pasarelas de pago
-- API para QR masivos
-- Configuraciones globales
+- Gestión de contactos y horarios
+- Temas de color personalizables
+- Integración con PayPal
+- API para generación de QR
+
+### 🔌 Integraciones
+- Dispositivos HikVision
+- Shelly Cloud
+- Registro y visualización de logs de errores
 
 ## 📋 Requisitos del Sistema
 
-- **Servidor Web:** Apache 2.4+
-- **PHP:** 7.4+ (recomendado 8.0+)
-- **MySQL:** 5.7+ o MariaDB 10.3+
-- **Extensiones PHP requeridas:**
+- **PHP**: 7.4 o superior
+- **MySQL**: 5.7 o superior
+- **Servidor Web**: Apache con mod_rewrite
+- **Extensiones PHP requeridas**:
   - PDO
-  - PDO_MySQL
-  - mbstring
+  - pdo_mysql
   - json
-  - session
+  - mbstring
+  - openssl
 
-## 🔧 Instalación
+## 🛠️ Instalación
 
 ### 1. Clonar o Descargar el Repositorio
 
 ```bash
-git clone https://github.com/danjohn007/CRMVisas.git
-cd CRMVisas
+git clone https://github.com/danjohn007/CRMIntranet.git
+cd CRMIntranet
 ```
 
-### 2. Configurar Apache
+### 2. Configurar el Servidor Web
 
-El sistema puede instalarse en cualquier directorio de Apache. La URL base se detecta automáticamente.
+#### Apache (usando XAMPP, WAMP, LAMP, etc.)
 
-**Opción A: Directorio raíz**
-```
-/var/www/html/
-```
+Copie el proyecto a la carpeta del servidor:
+- **XAMPP**: `C:\xampp\htdocs\CRMIntranet`
+- **WAMP**: `C:\wamp\www\CRMIntranet`
+- **Linux**: `/var/www/html/CRMIntranet`
 
-**Opción B: Subdirectorio**
-```
-/var/www/html/crmvisas/
-```
+El sistema está diseñado para funcionar en cualquier directorio gracias a la detección automática de URL base.
 
-**Configuración .htaccess (opcional para URLs amigables):**
-Crear `.htaccess` en la raíz del proyecto:
-```apache
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ public/index.php [L,QSA]
-```
+### 3. Configurar la Base de Datos
 
-### 3. Crear la Base de Datos
+1. Acceda a phpMyAdmin o su gestor de MySQL
+2. Ejecute el archivo `database/schema.sql` completo
+3. Este archivo creará:
+   - Base de datos `crm_visas`
+   - Todas las tablas necesarias
+   - Datos de ejemplo del estado de Querétaro
+   - Usuarios de prueba
 
-```bash
-mysql -u root -p
-```
+### 4. Configurar Credenciales de Base de Datos
 
-```sql
-CREATE DATABASE crm_visas CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-exit;
-```
-
-### 4. Importar el Schema SQL
-
-```bash
-mysql -u root -p crm_visas < assets/sql/schema.sql
-```
-
-Esto creará todas las tablas necesarias y datos de ejemplo para Querétaro, incluyendo:
-- 4 usuarios de prueba (admin, supervisor, 2 asesores)
-- Servicios de visa predefinidos (USA, Canadá, Schengen)
-- Clientes de ejemplo
-- Configuraciones del sistema
-- Plantillas de email
-
-### 5. Configurar la Conexión a la Base de Datos
-
-Editar `config/config.php` con tus credenciales:
+Edite el archivo `/config/config.php` (líneas 15-18):
 
 ```php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'tu_usuario');
-define('DB_PASS', 'tu_contraseña');
-define('DB_NAME', 'crm_visas');
+define('DB_HOST', 'localhost');      // Host de MySQL
+define('DB_NAME', 'crm_visas');      // Nombre de la base de datos
+define('DB_USER', 'root');           // Usuario de MySQL
+define('DB_PASS', '');               // Contraseña de MySQL
 ```
 
-### 6. Configurar Permisos
+### 5. Configurar Permisos
+
+Asegúrese de que el directorio `public/uploads` tenga permisos de escritura:
 
 ```bash
-# Dar permisos de escritura a la carpeta de uploads
 chmod -R 755 public/uploads
-chown -R www-data:www-data public/uploads
-
-# Si existe carpeta de cache
-chmod -R 755 cache
-chown -R www-data:www-data cache
 ```
 
-### 7. Probar la Instalación
+En Windows, generalmente no es necesario configurar permisos adicionales.
 
-Visitar: `http://tu-servidor/test_connection.php`
+### 6. Probar la Instalación
+
+#### Test Rápido de Conexión
+Acceda al archivo de prueba rápida en la raíz:
+```
+http://localhost/CRMIntranet/test_connection.php
+```
 
 Este archivo verificará:
-- ✅ Detección correcta de URL base
-- ✅ Conexión a base de datos
-- ✅ Versión de PHP y MySQL
-- ✅ Extensiones PHP necesarias
-- ✅ Configuración del sistema
+- ✅ Conexión a la base de datos
+- ✅ Versión de MySQL
+- ✅ Tablas existentes
+- ✅ Usuarios registrados
+- ✅ Configuración de PHP y PDO
 
-### 8. Acceder al Sistema
+#### Test Completo del Sistema
+Para una verificación más completa:
+```
+http://localhost/CRMIntranet/test-conexion
+```
 
-URL: `http://tu-servidor/public/index.php?page=login`
+Esta página verificará:
+- ✅ URL base configurada correctamente
+- ✅ Conexión a la base de datos
+- ✅ Existencia de tablas
+- ✅ Permisos de escritura
+- ✅ Extensiones PHP requeridas
 
-**Credenciales de Prueba:**
-
-| Usuario | Contraseña | Rol |
-|---------|------------|-----|
-| admin | password123 | Administrador |
-| supervisor1 | password123 | Supervisor |
-| asesor1 | password123 | Asesor |
-| asesor2 | password123 | Asesor |
-
-⚠️ **IMPORTANTE - SEGURIDAD:** 
-- Estas son credenciales de DEMO únicamente
-- **DEBE** cambiar todas las contraseñas antes de usar en producción
-- Para cambiar contraseñas, acceda como admin a: Usuarios → Editar Usuario
-- Considere eliminar usuarios de prueba y crear nuevos con contraseñas seguras
-
-## 🗂️ Estructura del Proyecto
+### 7. Acceder al Sistema
 
 ```
-CRMVisas/
+http://localhost/CRMIntranet/
+```
+
+## 👤 Usuarios de Prueba
+
+El sistema incluye los siguientes usuarios de ejemplo:
+
+| Usuario | Contraseña | Rol | Email |
+|---------|-----------|-----|-------|
+| admin | password123 | Administrador | admin@crmvisas.com |
+| gerente01 | password123 | Gerente | gerente@crmvisas.com |
+| asesor01 | password123 | Asesor | asesor1@crmvisas.com |
+| asesor02 | password123 | Asesor | asesor2@crmvisas.com |
+
+## 📁 Estructura del Proyecto
+
+```
+CRMIntranet/
 ├── app/
-│   ├── controllers/          # Controladores MVC
-│   │   ├── AuthController.php
-│   │   ├── BaseController.php
-│   │   ├── ClientController.php
-│   │   ├── DashboardController.php
-│   │   ├── ServiceController.php
-│   │   ├── RequestController.php
-│   │   ├── PaymentController.php
-│   │   ├── FinancialController.php
-│   │   ├── ReportController.php
-│   │   ├── SettingsController.php
-│   │   ├── UserController.php
-│   │   └── QuestionnaireController.php
-│   ├── models/               # Modelos y lógica de negocio
-│   │   ├── Database.php
-│   │   └── Router.php
-│   └── views/                # Vistas PHP con Tailwind CSS
-│       ├── auth/
-│       ├── dashboard/
-│       ├── clients/
-│       ├── services/
-│       ├── requests/
-│       ├── payments/
-│       ├── financial/
-│       ├── reports/
-│       ├── settings/
-│       ├── users/
-│       ├── questionnaire/
-│       ├── layouts/
-│       └── errors/
-├── assets/
-│   ├── sql/                  # Scripts SQL
-│   │   └── schema.sql
-│   └── docs/                 # Documentación
+│   ├── controllers/      # Controladores MVC
+│   ├── models/           # Modelos de datos
+│   └── views/            # Vistas HTML/PHP
 ├── config/
-│   ├── config.php            # Configuración general
-│   └── url.php               # Detección automática de URL base
+│   ├── config.php        # Configuración general
+│   └── database.php      # Conexión a BD
+├── database/
+│   └── schema.sql        # Estructura de BD con datos de ejemplo
 ├── public/
-│   ├── index.php             # Punto de entrada principal
-│   ├── css/                  # Estilos personalizados
-│   ├── js/                   # JavaScript
-│   ├── images/               # Imágenes
-│   └── uploads/              # Archivos subidos
-├── test_connection.php       # Test de configuración
-├── .gitignore
-└── README.md
+│   ├── css/              # Estilos personalizados
+│   ├── js/               # JavaScript
+│   ├── uploads/          # Archivos subidos
+│   └── index.php         # Punto de entrada
+├── .htaccess             # Configuración Apache
+├── test_connection.php   # Test rápido de conexión DB
+└── README.md             # Este archivo
 ```
+│   ├── uploads/          # Archivos subidos
+│   └── index.php         # Punto de entrada
+├── .htaccess             # Configuración Apache
+└── README.md             # Este archivo
+```
+
+## 🔒 Seguridad
+
+### Medidas Implementadas
+
+- ✅ Autenticación con `password_hash()` y `password_verify()`
+- ✅ Sesiones seguras con cookies HTTPOnly
+- ✅ Validación de permisos en cada endpoint
+- ✅ Preparación de consultas SQL (PDO Prepared Statements)
+- ✅ Sanitización de entradas de usuario
+- ✅ Protección contra listado de directorios
+- ✅ Logs de errores separados de la aplicación
+
+### Regla Crítica de Seguridad
+
+**Los Asesores NO pueden ver solicitudes con estatus "Finalizado"**
+
+Esta regla está implementada a nivel de:
+- Base de datos (queries filtrados)
+- Controladores (validación de permisos)
+- Vistas (ocultar información)
 
 ## 🎨 Tecnologías Utilizadas
 
-- **Backend:** PHP puro (sin frameworks)
-- **Base de Datos:** MySQL 5.7+ / MariaDB
-- **Frontend:** HTML5, CSS3, JavaScript
-- **Estilos:** Tailwind CSS (CDN)
-- **Iconos:** Font Awesome 6
-- **Gráficas:** Chart.js
-- **Arquitectura:** MVC (Model-View-Controller)
-- **Seguridad:** 
-  - PDO con prepared statements
-  - password_hash() y password_verify()
-  - Sanitización de inputs
-  - Auditoría completa
+- **Backend**: PHP puro (sin frameworks)
+- **Base de Datos**: MySQL 5.7
+- **Frontend**: 
+  - HTML5 + CSS3
+  - Tailwind CSS (diseño responsivo)
+  - JavaScript vanilla
+- **Gráficas**: Chart.js / ApexCharts
+- **Iconos**: Font Awesome 6
+- **Calendario**: FullCalendar.js
+- **Arquitectura**: MVC (Model-View-Controller)
 
-## 🔐 Seguridad
+## 📚 Uso del Sistema
 
-El sistema implementa múltiples capas de seguridad:
+### Para Asesores
 
-1. **Autenticación:** Sesiones seguras con cookies HTTPOnly
-2. **Passwords:** Hashing con bcrypt (password_hash)
-3. **Base de Datos:** PDO con prepared statements (prevención SQL injection)
-4. **Entrada de Datos:** Sanitización y validación
-5. **Control de Acceso:** Basado en roles (RBAC)
-6. **Auditoría:** Log completo de todas las acciones
-7. **Sesiones:** Configuradas de forma segura
+1. Iniciar sesión con credenciales de Asesor
+2. Crear nueva solicitud desde el menú
+3. Seleccionar tipo de formulario
+4. Completar información del solicitante
+5. Subir documentos requeridos
+6. Visualizar solo solicitudes activas (no finalizadas)
 
-### ⚠️ Checklist de Seguridad para Producción
+### Para Gerentes
 
-Antes de desplegar en producción, **DEBE**:
+1. Ver todas las solicitudes (incluidas finalizadas)
+2. Cambiar estatus de solicitudes
+3. Acceder al módulo financiero
+4. Registrar costos y pagos
+5. Generar reportes
+6. Finalizar solicitudes
 
-- [ ] Cambiar todas las contraseñas de usuarios por defecto
-- [ ] Generar nueva clave de encriptación en `config/config.php`
-- [ ] Deshabilitar error reporting (`error_reporting(0)` y `display_errors = 0`)
-- [ ] Configurar HTTPS/SSL (habilitar en config/config.php línea 15)
-- [ ] Cambiar credenciales de base de datos
-- [ ] Revisar permisos de archivos (755 para directorios, 644 para archivos)
-- [ ] Configurar respaldos automáticos de base de datos
-- [ ] Revisar configuración de `.htaccess` según su servidor
+### Para Administradores
 
-## 📱 Características Destacadas
+1. Todas las funciones de Gerente
+2. Crear y editar formularios dinámicos
+3. Gestionar usuarios del sistema
+4. Configurar parámetros globales
+5. Ver logs de errores
+6. Gestionar dispositivos IoT (HikVision, Shelly)
 
-### Responsive Design
-- Diseño completamente adaptable a móviles, tablets y escritorio
-- Optimizado con Tailwind CSS
+## 🔧 Configuración Avanzada
 
-### URLs Amigables
-- Sistema de routing limpio
-- URLs descriptivas y SEO-friendly
+### URL Amigables
 
-### Auto-configuración
-- Detección automática de URL base
-- Adaptable a cualquier directorio de instalación
+El sistema detecta automáticamente la URL base. Si necesita instalarlo en un subdirectorio:
 
-### Auditoría Completa
-- Registro de todas las acciones del sistema
-- Trazabilidad completa de cambios
+```
+http://localhost/misubdirectorio/CRMIntranet/
+```
 
-### Multi-idioma Ready
-- Estructura preparada para internacionalización
-
-## 🔄 Flujo de Trabajo Típico
-
-1. **Admin/Supervisor** crea servicios de visa con sus requisitos
-2. **Asesor** registra nuevo cliente en el sistema
-3. **Asesor** crea solicitud de visa asociada al cliente
-4. Sistema genera **enlace público** para cuestionario del cliente
-5. **Cliente** completa cuestionario desde su dispositivo
-6. **Asesor** revisa documentación contra checklist
-7. **Asesor** registra pagos del servicio
-8. Sistema actualiza estado y notifica cambios
-9. **Supervisor/Admin** revisa reportes y estadísticas
-10. **Admin** gestiona configuración y usuarios
-
-## 📊 Dashboard y Reportes
-
-El sistema incluye:
-- Dashboard con estadísticas en tiempo real
-- Tarjetas de resumen (clientes, solicitudes, pagos)
-- Solicitudes recientes
-- Tareas pendientes
-- Gráficas de tendencias
-- Reportes exportables
-
-## 🛠️ Personalización
+No requiere configuración adicional.
 
 ### Cambiar Colores del Sistema
-1. Ir a: Admin → Configuración → Tema
-2. Modificar colores primarios y secundarios
 
-### Configurar Email
-1. Ir a: Admin → Configuración → Email
-2. Configurar SMTP o email del sistema
+1. Login como Administrador
+2. Ir a Configuración > Personalización
+3. Modificar colores primarios y secundarios
 
-### Agregar Nuevos Servicios
-1. Ir a: Servicios → Nuevo Servicio
-2. Completar formulario con detalles del servicio
-3. Configurar checklist de documentos requeridos
+### Integración con PayPal
 
-## 📞 Soporte
+1. Ir a Configuración > Módulo Financiero
+2. Ingresar Client ID y Secret de PayPal
+3. Guardar configuración
 
-Para reportar problemas o sugerencias:
-- **GitHub Issues:** https://github.com/danjohn007/CRMVisas/issues
-- **Email:** contacto@crmvisas.com
+## 🐛 Resolución de Problemas
+
+### Error de conexión a la base de datos
+
+- Verificar credenciales en `/config/config.php`
+- Confirmar que MySQL esté ejecutándose
+- Verificar que la base de datos `crm_visas` exista
+
+### URLs no funcionan (404)
+
+- Verificar que `mod_rewrite` esté habilitado en Apache
+- Revisar que los archivos `.htaccess` existan
+- En httpd.conf, cambiar `AllowOverride None` a `AllowOverride All`
+
+### No se pueden subir archivos
+
+- Verificar permisos del directorio `public/uploads`
+- Aumentar `upload_max_filesize` en `php.ini` si es necesario
+
+### Página de login muestra en blanco
+
+- Verificar logs de error de PHP
+- Revisar que todas las extensiones PHP estén instaladas
+- Ver el archivo `/error.log`
+
+## 📖 Documentación Adicional
+
+### Flujo de Estatus de Solicitudes
+
+1. **Creado** - Solicitud registrada por Asesor
+2. **En revisión** - Gerente/Admin revisa documentación
+3. **Información incompleta** - Requiere datos adicionales
+4. **Documentación validada** - Documentos aprobados
+5. **En proceso** - Trámite en curso
+6. **Aprobado** - Trámite aprobado
+7. **Rechazado** - Trámite rechazado
+8. **Finalizado** - Trámite entregado (invisible para Asesores)
+
+### Estados Financieros
+
+- **Pendiente** - Sin pagos registrados
+- **Parcial** - Pago parcial realizado
+- **Pagado** - Completamente pagado
+
+## 🤝 Contribución
+
+Para contribuir al proyecto:
+
+1. Fork el repositorio
+2. Crear una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir un Pull Request
 
 ## 📄 Licencia
 
-Este proyecto está desarrollado como software privado. Todos los derechos reservados.
+Este proyecto es de código abierto y está disponible bajo la licencia MIT.
 
-## 👥 Créditos
+## 📞 Soporte
 
-Desarrollado para la gestión profesional de trámites de visas en Querétaro, México.
+Para soporte técnico o consultas:
 
----
-
-## 🚀 Próximas Características
-
-- [ ] Integración completa con PayPal/Stripe
-- [ ] Generación de QR para pagos
-- [ ] Calendario integrado con FullCalendar.js
-- [ ] Notificaciones push
-- [ ] API REST para integraciones
-- [ ] App móvil
-- [ ] Chat en vivo con clientes
-- [ ] Firma electrónica de documentos
+- **Email**: admin@crmvisas.com
+- **Teléfono**: 442-123-4567
+- **Horario**: Lunes a Viernes 9:00 AM - 6:00 PM
 
 ---
 
-**Versión:** 1.0.0  
-**Última actualización:** Diciembre 2025
+Desarrollado con ❤️ siguiendo la filosofía VIBE CODING - Sistema CRM Visas y Pasaportes Querétaro

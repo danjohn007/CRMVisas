@@ -1,0 +1,61 @@
+CRM VISAS V5.5 - PAGINACIÓN Y FILTROS EN MIS VENTAS
+=======================================================
+
+MÓDULO: ASESORA > MIS VENTAS
+----------------------------
+Se ajustó la sección "Mis ventas y saldos" para evitar que la página crezca
+indefinidamente conforme se registren más operaciones.
+
+CAMBIOS
+-------
+1. Cantidad de registros por página
+   - 20 ventas (predeterminado y mínimo)
+   - 30 ventas
+   - 50 ventas (máximo)
+
+2. Filtro por fecha
+   - Desde
+   - Hasta
+   - Puede utilizar una sola fecha o un rango completo.
+   - Si accidentalmente se captura Desde posterior a Hasta, el sistema corrige
+     internamente el orden del rango.
+
+3. Paginación
+   - Primera página
+   - Anterior
+   - Números de página
+   - Siguiente
+   - Última página
+   - Sólo aparece cuando realmente existen más páginas.
+
+4. Resumen visible
+   Ejemplo:
+   "Mostrando 21 a 40 de 137 ventas."
+
+5. Orden
+   - Las ventas más recientes aparecen primero.
+   - Dentro de la misma fecha se usa la venta más reciente primero.
+
+6. Rendimiento
+   - La paginación se realiza en MySQL/PHP del lado del servidor.
+   - El navegador NO carga todas las ventas para después ocultarlas.
+   - Esto permite que la vista siga siendo ágil con muchos registros.
+
+SEGURIDAD
+---------
+- El parámetro per_page sólo acepta 20, 30 o 50.
+- No puede solicitarse un número arbitrario mayor a 50 mediante la URL.
+- Continúa mostrando exclusivamente las ventas de la asesora autenticada.
+
+INSTALACIÓN
+-----------
+No requiere SQL.
+
+Reemplazar:
+- app/controllers/AdvisorIncomeController.php
+- app/views/advisor-income/index.php
+
+Después:
+1. Cerrar sesión.
+2. Volver a entrar.
+3. Usar Ctrl + F5 para limpiar caché.

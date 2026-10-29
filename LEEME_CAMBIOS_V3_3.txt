@@ -1,0 +1,14 @@
+CRM VISAS - ARCHIVOS WEB V3.3
+
+Este paquete conserva los ajustes previos de Conversaciones (buscador, asignación persistente y plantillas Meta) y agrega el nuevo diseño del login.
+
+Reemplazar respetando estas rutas:
+- app/controllers/WhatsAppController.php
+- app/controllers/Router.php
+- app/views/whatsapp/index.php
+- app/views/auth/login.php
+- public/uploads/logo-visas-login.png
+
+El login conserva CAPTCHA, geolocalización y autenticación existentes. Solo cambia la presentación visual y agrega el icono para mostrar/ocultar contraseña.
+
+Además, en Conversaciones el panel "Primer contacto" ahora agrupa y muestra todos los perfilamientos guardados del cliente por servicio. El trámite actual aparece marcado como "Actual" y los anteriores permanecen visibles.

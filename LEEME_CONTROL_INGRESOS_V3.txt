@@ -1,0 +1,120 @@
+CONTROL DE INGRESOS V3 — INSTALACIÓN Y PRUEBA
+================================================
+
+ALCANCE
+------
+Esta versión desarrolla únicamente INGRESOS.
+El módulo de EGRESOS se realizará en una segunda etapa.
+
+FLUJO DEFINITIVO
+----------------
+1. La ASESORA registra la venta desde "Registrar ventas".
+2. Selecciona el cliente/expediente y un concepto del Catálogo Maestro.
+3. El precio autorizado se carga automáticamente.
+4. Puede reportar uno o varios componentes del pago inicial
+   (ejemplo: parte transferencia + parte efectivo).
+5. Los pagos capturados por la asesora quedan PENDIENTES DE VALIDACIÓN.
+6. GERENCIA abre "Control de Ingresos" y valida o rechaza cada pago.
+7. Sólo un pago VALIDADO:
+   - aumenta el Abonado del cliente;
+   - reduce su Saldo;
+   - se considera ingreso real;
+   - entra al Balance Semanal;
+   - aparece en Dashboard/Estadísticas.
+8. Los siguientes abonos se registran en el MISMO expediente financiero.
+9. Saldo pendiente = ROJO. Liquidado = VERDE.
+10. El Balance Semanal utiliza periodos de LUNES A VIERNES.
+
+PERMISOS
+--------
+ASESOR:
+- Registra ventas de su propia cartera.
+- Adjunta comprobantes.
+- Consulta el Total / Abonado / Saldo de sus propios clientes.
+- NO accede al Balance Semanal, cuentas bancarias ni reportes financieros globales.
+
+GERENTE:
+- Control de Ingresos.
+- Valida/rechaza pagos.
+- Registra abonos.
+- Consulta saldos.
+- Balance Semanal.
+- Cierra semanas.
+- Descarga PDF y reportes Excel.
+
+ADMINISTRADOR / DIRECCIÓN:
+- Todo lo anterior.
+- Autoriza temporalmente correcciones de periodos cerrados.
+- Acceso a auditoría y supervisión global.
+
+INSTALACIÓN
+-----------
+IMPORTANTE: haga respaldo de archivos y base de datos.
+
+1. Este paquete parte de la versión Finanzas V2.
+2. Ejecute UNA VEZ:
+   database/migrations/add_control_ingresos_v3.sql
+3. Suba/reemplace los archivos del ZIP.
+4. Verifique los roles:
+   - Vanesa Torres: Administrador
+   - Rose: Gerente
+   - Asesoras: Asesor
+5. Confirme que storage/finance/payment-proofs/ tenga permiso de escritura.
+   El sistema crea las subcarpetas por año/mes automáticamente.
+
+CATÁLOGO
+--------
+Se cargaron ING-001 a ING-036 según el Catálogo Maestro entregado.
+Los conceptos con precio confirmado quedan activos.
+Los precios históricos, "por confirmar", "según diferencia" o
+"según cotización" permanecen INACTIVOS hasta autorización.
+
+También se cargaron:
+COB-001 a COB-007: conceptos de cobranza / abonos.
+MOV-001 a MOV-005: movimientos definidos en catálogo.
+En esta versión los MOV no se utilizan para generar ventas adicionales.
+
+DATOS ANTERIORES
+----------------
+Los pagos existentes en la tabla payments se migran como VALIDADOS
+para conservar el historial ya confirmado.
+
+Los registros del antiguo módulo advisor_income_records permanecen
+en la base de datos como histórico. No se convierten automáticamente
+en ingresos validados porque ese módulo anterior no contaba con el
+nuevo paso de validación de Gerencia; hacerlo podría duplicar dinero.
+
+PRUEBA RECOMENDADA
+------------------
+1. Cree/seleccione un cliente de prueba asignado a una asesora.
+2. Entre como Asesor y registre:
+   Servicio: Visa americana primera vez con transporte
+   Total esperado: $6,520
+   Pago inicial:
+      $2,720 Transferencia
+      $1,000 Efectivo
+3. Abra el expediente:
+   Total: $6,520
+   Abonado validado: $0
+   Saldo: $6,520
+   Pagos por validar: $3,720
+   Estado: ROJO
+4. Entre como Gerente.
+5. Abra Control de Ingresos.
+6. Valide ambas partes del pago.
+   - Transferencia: indique cuenta receptora.
+   - Efectivo: indique sobre/Caja Libre.
+7. Regrese al expediente:
+   Abonado: $3,720
+   Saldo: $2,800
+8. Registre un abono de $2,800.
+9. El expediente debe cambiar a LIQUIDADO / VERDE.
+10. Abra Balance Semanal y compruebe que sólo aparezcan pagos validados.
+11. Descargue PDF y Excel.
+12. Cierre la semana. Si existe un pago pendiente de validación,
+    el sistema no permitirá cerrar.
+
+NOTA
+----
+Las rutas antiguas /financiero e /ingresos-egresos se conservan
+internamente por compatibilidad, pero redirigen al nuevo flujo.

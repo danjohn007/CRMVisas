@@ -1,12 +1,15 @@
 <?php
 /**
- * Connection Test and URL Base Confirmation
- * Tests database connection and displays configuration info
+ * Test de Conexión a Base de Datos
+ * Archivo standalone para verificar la conectividad con MySQL
+ * 
+ * Acceso directo: http://your-domain/test_connection.php
  */
 
+// Cargar configuración
 require_once __DIR__ . '/config/config.php';
-require_once __DIR__ . '/config/url.php';
 
+// Iniciar salida HTML
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -14,89 +17,303 @@ require_once __DIR__ . '/config/url.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test de Conexión - CRM Visas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-result {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .info-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .info-card h3 {
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .info-card p {
+            color: #666;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+        }
+        .status-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        .details strong {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        table td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        table td:first-child {
+            font-weight: 600;
+            color: #666;
+            width: 40%;
+        }
+        table td:last-child {
+            font-family: 'Courier New', monospace;
+            color: #333;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
-        <div class="max-w-2xl mx-auto">
-            <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Test de Conexión - CRM Visas</h1>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔌 Test de Conexión a Base de Datos</h1>
+            <p>Sistema CRM de Visas y Pasaportes</p>
+        </div>
+        
+        <div class="content">
+            <?php
+            // Variables para almacenar resultados
+            $connectionSuccess = false;
+            $errorMessage = '';
+            $dbInfo = [];
             
-            <!-- URL Base Test -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-green-600">✓ Configuración de URL Base</h2>
-                <div class="space-y-2">
-                    <p><strong>URL Base:</strong> <code class="bg-gray-100 px-2 py-1 rounded"><?php echo BASE_URL; ?></code></p>
-                    <p><strong>Protocolo:</strong> <?php echo (strpos(BASE_URL, 'https') !== false) ? 'HTTPS (Seguro)' : 'HTTP'; ?></p>
-                    <p><strong>Host:</strong> <?php echo $_SERVER['HTTP_HOST']; ?></p>
-                    <p><strong>Ruta Base:</strong> <?php echo str_replace($_SERVER['HTTP_HOST'], '', BASE_URL); ?></p>
-                </div>
-            </div>
-            
-            <!-- Database Connection Test -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4">Base de Datos</h2>
-                <?php
+            // Intentar conexión
+            try {
+                // Crear conexión PDO
+                $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=" . DB_CHARSET;
+                $options = [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ];
+                
+                $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
+                $connectionSuccess = true;
+                
+                // Obtener información de la base de datos
+                $stmt = $pdo->query("SELECT VERSION() as version");
+                $result = $stmt->fetch();
+                $dbInfo['version'] = $result['version'];
+                
+                // Obtener nombre de la base de datos actual
+                $stmt = $pdo->query("SELECT DATABASE() as dbname");
+                $result = $stmt->fetch();
+                $dbInfo['database'] = $result['dbname'];
+                
+                // Contar tablas
+                $stmt = $pdo->query("SHOW TABLES");
+                $dbInfo['tables_count'] = $stmt->rowCount();
+                
+                // Obtener lista de tablas
+                $stmt = $pdo->query("SHOW TABLES");
+                $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+                $dbInfo['tables'] = $tables;
+                
+                // Verificar si hay usuarios en la tabla users
                 try {
-                    require_once __DIR__ . '/app/models/Database.php';
-                    $db = Database::getInstance();
-                    $conn = $db->getConnection();
-                    
-                    // Test query
-                    $stmt = $conn->query("SELECT VERSION() as version");
+                    $stmt = $pdo->query("SELECT COUNT(*) as count FROM users");
                     $result = $stmt->fetch();
-                    
-                    echo '<div class="text-green-600">';
-                    echo '<p class="font-semibold">✓ Conexión Exitosa</p>';
-                    echo '<div class="mt-3 space-y-2">';
-                    echo '<p><strong>Host:</strong> ' . DB_HOST . '</p>';
-                    echo '<p><strong>Base de datos:</strong> ' . DB_NAME . '</p>';
-                    echo '<p><strong>Usuario:</strong> ' . DB_USER . '</p>';
-                    echo '<p><strong>MySQL Version:</strong> ' . $result['version'] . '</p>';
-                    echo '</div>';
-                    echo '</div>';
-                    
-                } catch (Exception $e) {
-                    echo '<div class="text-red-600">';
-                    echo '<p class="font-semibold">✗ Error de Conexión</p>';
-                    echo '<p class="mt-2">' . htmlspecialchars($e->getMessage()) . '</p>';
-                    echo '<div class="mt-3 bg-yellow-50 border border-yellow-200 rounded p-3">';
-                    echo '<p class="text-sm text-yellow-800"><strong>Nota:</strong> Asegúrate de:</p>';
-                    echo '<ul class="list-disc list-inside text-sm text-yellow-800 mt-2">';
-                    echo '<li>Crear la base de datos ejecutando el archivo SQL en assets/sql/</li>';
-                    echo '<li>Verificar las credenciales en config/config.php</li>';
-                    echo '<li>Asegurarte de que MySQL esté en ejecución</li>';
-                    echo '</ul>';
+                    $dbInfo['users_count'] = $result['count'];
+                } catch (PDOException $e) {
+                    $dbInfo['users_count'] = 'Tabla no encontrada';
+                }
+                
+            } catch (PDOException $e) {
+                $connectionSuccess = false;
+                $errorMessage = $e->getMessage();
+            }
+            
+            // Mostrar resultado
+            if ($connectionSuccess) {
+                echo '<div class="test-result success">';
+                echo '<span class="status-icon">✅</span>';
+                echo '<h2 style="margin-bottom: 10px;">¡Conexión Exitosa!</h2>';
+                echo '<p>La conexión a la base de datos se estableció correctamente.</p>';
+                echo '</div>';
+                
+                // Mostrar información de la base de datos
+                echo '<div class="info-grid">';
+                
+                echo '<div class="info-card">';
+                echo '<h3>Versión MySQL</h3>';
+                echo '<p>' . htmlspecialchars($dbInfo['version']) . '</p>';
+                echo '</div>';
+                
+                echo '<div class="info-card">';
+                echo '<h3>Base de Datos</h3>';
+                echo '<p>' . htmlspecialchars($dbInfo['database']) . '</p>';
+                echo '</div>';
+                
+                echo '<div class="info-card">';
+                echo '<h3>Tablas Encontradas</h3>';
+                echo '<p>' . $dbInfo['tables_count'] . ' tablas</p>';
+                echo '</div>';
+                
+                echo '<div class="info-card">';
+                echo '<h3>Usuarios Registrados</h3>';
+                echo '<p>' . htmlspecialchars($dbInfo['users_count']) . '</p>';
+                echo '</div>';
+                
+                echo '</div>';
+                
+                // Mostrar detalles de configuración
+                echo '<div class="details">';
+                echo '<h3 style="margin-bottom: 10px; color: #333;">📋 Detalles de Configuración</h3>';
+                echo '<table>';
+                echo '<tr><td>Host:</td><td>' . htmlspecialchars(DB_HOST) . '</td></tr>';
+                echo '<tr><td>Base de Datos:</td><td>' . htmlspecialchars(DB_NAME) . '</td></tr>';
+                echo '<tr><td>Usuario:</td><td>' . htmlspecialchars(DB_USER) . '</td></tr>';
+                echo '<tr><td>Charset:</td><td>' . htmlspecialchars(DB_CHARSET) . '</td></tr>';
+                echo '<tr><td>PHP Version:</td><td>' . phpversion() . '</td></tr>';
+                echo '<tr><td>Extensión PDO:</td><td>' . (extension_loaded('pdo_mysql') ? '✅ Instalada' : '❌ No instalada') . '</td></tr>';
+                echo '</table>';
+                echo '</div>';
+                
+                // Mostrar lista de tablas
+                if (!empty($dbInfo['tables'])) {
+                    echo '<div class="details" style="margin-top: 20px;">';
+                    echo '<h3 style="margin-bottom: 10px; color: #333;">📊 Tablas en la Base de Datos</h3>';
+                    echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">';
+                    foreach ($dbInfo['tables'] as $table) {
+                        echo '<div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">';
+                        echo '📁 ' . htmlspecialchars($table);
+                        echo '</div>';
+                    }
                     echo '</div>';
                     echo '</div>';
                 }
-                ?>
+                
+            } else {
+                echo '<div class="test-result error">';
+                echo '<span class="status-icon">❌</span>';
+                echo '<h2 style="margin-bottom: 10px;">Error de Conexión</h2>';
+                echo '<p>No se pudo establecer la conexión con la base de datos.</p>';
+                echo '</div>';
+                
+                echo '<div class="details">';
+                echo '<h3 style="margin-bottom: 10px; color: #333;">🔍 Detalles del Error</h3>';
+                echo '<p style="color: #721c24; font-family: monospace; background: white; padding: 10px; border-radius: 4px;">';
+                echo htmlspecialchars($errorMessage);
+                echo '</p>';
+                
+                echo '<h3 style="margin: 20px 0 10px; color: #333;">📋 Configuración Actual</h3>';
+                echo '<table>';
+                echo '<tr><td>Host:</td><td>' . htmlspecialchars(DB_HOST) . '</td></tr>';
+                echo '<tr><td>Base de Datos:</td><td>' . htmlspecialchars(DB_NAME) . '</td></tr>';
+                echo '<tr><td>Usuario:</td><td>' . htmlspecialchars(DB_USER) . '</td></tr>';
+                echo '<tr><td>Charset:</td><td>' . htmlspecialchars(DB_CHARSET) . '</td></tr>';
+                echo '</table>';
+                
+                echo '<h3 style="margin: 20px 0 10px; color: #333;">💡 Posibles Soluciones</h3>';
+                echo '<ul style="margin-left: 20px; line-height: 1.8;">';
+                echo '<li>Verificar que MySQL esté ejecutándose</li>';
+                echo '<li>Comprobar las credenciales en <code>config/config.php</code></li>';
+                echo '<li>Asegurarse de que la base de datos existe</li>';
+                echo '<li>Verificar permisos del usuario de base de datos</li>';
+                echo '<li>Revisar que el host sea correcto (localhost, 127.0.0.1, etc.)</li>';
+                echo '</ul>';
+                echo '</div>';
+            }
+            ?>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="<?php echo BASE_URL; ?>/test-conexion" class="btn">
+                    🔍 Ver Test Completo del Sistema
+                </a>
+                <a href="<?php echo BASE_URL; ?>/login" class="btn" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    🏠 Ir al Sistema
+                </a>
             </div>
             
-            <!-- System Information -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Información del Sistema</h2>
-                <div class="space-y-2">
-                    <p><strong>PHP Version:</strong> <?php echo phpversion(); ?></p>
-                    <p><strong>Servidor:</strong> <?php echo $_SERVER['SERVER_SOFTWARE']; ?></p>
-                    <p><strong>Zona Horaria:</strong> <?php echo date_default_timezone_get(); ?></p>
-                    <p><strong>PDO MySQL:</strong> <?php echo extension_loaded('pdo_mysql') ? '✓ Habilitado' : '✗ No disponible'; ?></p>
-                    <p><strong>Tamaño máximo de subida:</strong> <?php echo ini_get('upload_max_filesize'); ?></p>
-                </div>
-            </div>
-            
-            <!-- Actions -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Acciones</h2>
-                <div class="space-y-3">
-                    <a href="<?php echo BASE_URL; ?>/public/index.php" 
-                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded">
-                        Ir al Sistema
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>/assets/sql/schema.sql" 
-                       class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 px-4 rounded">
-                        Descargar SQL Schema
-                    </a>
-                </div>
+            <div class="details" style="margin-top: 30px; text-align: center; font-size: 12px;">
+                <p><strong>Archivo:</strong> test_connection.php</p>
+                <p><strong>Ubicación:</strong> Raíz del proyecto</p>
+                <p><strong>Fecha:</strong> <?php echo date('d/m/Y H:i:s'); ?></p>
             </div>
         </div>
     </div>

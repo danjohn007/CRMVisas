@@ -1,0 +1,24 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /intranet/public/
+    
+    # Si el archivo o directorio existe, mostrarlo directamente
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Redirigir todas las solicitudes a index.php
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule>
+
+# Deshabilitar listado de directorios
+Options -Indexes
+
+<FilesMatch (^\.|\.(?:env|ini|log|sql|bak|backup|old)$)>
+    Require all denied
+</FilesMatch>
+
+# Permitir acceso a archivos estáticos
+<FilesMatch "\.(jpg|jpeg|png|gif|css|js|ico|svg|woff|woff2|ttf|eot)$">
+    Order allow,deny
+    Allow from all
+</FilesMatch>

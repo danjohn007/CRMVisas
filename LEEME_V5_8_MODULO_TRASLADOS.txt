@@ -1,0 +1,95 @@
+CRM VISAS V5.8 - NUEVO MÓDULO TRASLADOS
+========================================
+
+OBJETIVO
+--------
+Módulo exclusivamente operativo para organizar los clientes que asistirán a cada traslado.
+NO contiene ni consulta costos, pagos, anticipos, saldos, ingresos, egresos o balances.
+
+FUNCIONES
+---------
+1. Menú principal: TRASLADOS.
+2. Crear un traslado por fecha.
+3. Capacidades disponibles:
+   - Autobús de 69 lugares.
+   - Autobús de 49 lugares.
+   - Autobús de 45 lugares.
+   - VAN de 20 lugares.
+4. Cada traslado tiene su propia lista independiente.
+5. Tabla con exactamente estas columnas:
+   ASESORA | NÚMERO DE LUGAR | NOMBRE DEL CLIENTE | TELÉFONO | CITA PARA REC Y REV | TODO LISTO
+6. Número de lugar único dentro de cada traslado.
+7. El sistema impide asignar lugares por encima de la capacidad seleccionada.
+8. Se puede seleccionar un expediente existente para precargar nombre/teléfono o capturar un cliente manualmente.
+9. Se muestra ocupación, lugares disponibles, clientes listos y pendientes.
+10. Al marcar TODO LISTO se registra el estado inmediatamente.
+11. Edición haciendo clic sobre la fila, sin agregar una columna extra de Acciones.
+12. Traslados Activos y Traslados Finalizados.
+
+PERMISOS
+--------
+ADMINISTRADOR / PROPIETARIA
+- Crear traslados.
+- Ver todos los clientes.
+- Agregar, modificar y retirar clientes.
+- Cerrar traslado.
+- Reabrir traslado.
+- Consultar activos e historial finalizado.
+
+GERENCIA
+- Ver todos los clientes.
+- Agregar, modificar y retirar clientes de traslados activos.
+- Consultar traslados activos y finalizados.
+- No puede crear/cerrar/reabrir traslados.
+
+ASESORA
+- Ve traslados activos.
+- Dentro de cada traslado sólo ve sus propios clientes.
+- Puede agregar clientes bajo su propia responsabilidad.
+- Puede editar sus clientes.
+- Puede marcar TODO LISTO.
+- Puede retirar sus propios clientes mientras el traslado está activo.
+- No puede ver traslados finalizados.
+- No puede cerrar ni reabrir traslados.
+
+CIERRE
+------
+Al cerrar un traslado:
+- cambia a FINALIZADO;
+- deja de aparecer para asesoras;
+- queda bloqueado contra modificaciones ordinarias;
+- Admin y Gerencia conservan consulta histórica;
+- Admin puede REABRIRLO si se necesita una corrección.
+
+BASE DE DATOS
+-------------
+Ejecutar UNA SOLA VEZ:
+
+database/migrations/14_modulo_traslados_v5_8.sql
+
+Crea exclusivamente:
+- travel_transfers
+- travel_transfer_clients
+
+No modifica las tablas financieras ni elimina información existente.
+
+INSTALACIÓN
+-----------
+1. Hacer respaldo de archivos y BD.
+2. Subir el ZIP V5.8 y reemplazar archivos.
+3. Ejecutar database/migrations/14_modulo_traslados_v5_8.sql en phpMyAdmin.
+4. Cerrar sesión y volver a entrar.
+5. Hacer Ctrl + F5.
+
+PRUEBA RECOMENDADA
+------------------
+1. Entrar como Administrador.
+2. Abrir TRASLADOS.
+3. Crear TRASLADO con una fecha futura y capacidad VAN 20.
+4. Agregar 2 clientes, lugares 01 y 02.
+5. Marcar uno como TODO LISTO.
+6. Entrar como la asesora asignada y comprobar que sólo vea sus clientes.
+7. Cerrar el traslado como Administrador.
+8. Confirmar que desaparece para la asesora.
+9. Confirmar que permanece en Finalizados para Admin/Gerencia.
+10. Reabrir y comprobar que vuelve a aparecer para la asesora.

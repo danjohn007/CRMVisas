@@ -1,0 +1,51 @@
+CRM VISAS V5.4 - FORMATO CARTA + PAGO AUTOMÁTICO EN NUEVA VENTA
+=================================================================
+
+1. NOTA DE REMISIÓN FORMAL
+--------------------------
+- Se maquetó en tamaño CARTA real: 8.5 x 11 pulgadas.
+- Cada hoja tiene márgenes internos uniformes.
+- La vista previa conserva la proporción de una hoja carta.
+- La primera hoja es la Nota de Remisión.
+- La segunda hoja contiene Términos y Condiciones.
+- Al imprimir, cada sección ocupa una hoja distinta.
+- Los márgenes evitan que texto y firmas queden pegados a las orillas.
+
+2. NUEVA VENTA
+--------------
+- Se eliminó el campo visible "Precio unitario".
+- El precio SIEMPRE se toma de income_catalog.authorized_price.
+- Total = precio autorizado x cantidad.
+- La asesora no puede alterar el precio unitario.
+
+3. FORMA DE PAGO
+----------------
+UN SOLO MÉTODO:
+- La asesora sólo selecciona Efectivo, Terminal o Transferencia.
+- NO captura importe.
+- El sistema asigna automáticamente el total completo de la venta.
+
+PAGO DIVIDIDO:
+- Al pulsar "+ Agregar otra forma de pago", aparecen los campos Importe.
+- La asesora captura cuánto se pagó con cada método.
+- La suma debe coincidir exactamente con el total de la venta.
+- El servidor vuelve a validar la suma aunque falle JavaScript.
+
+4. TICKET DE VENTA RÁPIDA
+-------------------------
+- Se conserva en formato ticket, porque copias/actas/servicios rápidos
+  deben entregar un comprobante corto.
+- La Nota de Remisión del trámite formal sí es tamaño carta.
+
+INSTALACIÓN
+-----------
+No requiere SQL.
+1. Respaldar archivos.
+2. Subir el ZIP de ajuste y reemplazar.
+3. Cerrar sesión y volver a entrar.
+4. Hacer Ctrl + F5.
+
+VALIDACIÓN
+----------
+- 143 archivos PHP validados con php -l.
+- Sin errores de sintaxis.

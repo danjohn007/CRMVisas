@@ -1,0 +1,38 @@
+CRM VISAS V5.0.3 - CORRECCIÓN REGISTRO DE EGRESOS
+=====================================================
+
+PROBLEMA
+--------
+En /intranet/egresos el campo Importe tenía:
+  min=0.01
+  max=<saldo actual de Efectivo>
+
+Cuando Efectivo era $0.00, el navegador generaba:
+"El valor mínimo (0.01) debe ser menor que el valor máximo (0)"
+y no permitía escribir ningún egreso.
+
+CORRECCIÓN
+----------
+- Se eliminó el atributo max del campo Importe.
+- Se eliminó el bloqueo de servidor que impedía registrar un egreso mayor
+  al efectivo calculado.
+- Gerencia puede registrar un egreso real aunque Efectivo esté en $0.
+- El egreso continúa descontándose ÚNICAMENTE de Efectivo.
+- Si el resultado queda negativo, el sistema lo muestra como alerta contable.
+- Auditoría guarda saldo de Efectivo antes y después del egreso.
+
+POR QUÉ
+-------
+Un movimiento real no debe dejar de capturarse porque falte registrar o
+validar un ingreso anterior. El Balance debe mostrar esa diferencia para
+que Gerencia pueda conciliarla.
+
+INSTALACIÓN
+-----------
+No requiere SQL adicional si la migración V5.0.2 ya fue ejecutada.
+Reemplace únicamente:
+- app/controllers/FinanceFlowController.php
+- app/views/finance-flow/expenses.php
+
+Este paquete completo también incluye la migración V5.0.2 segura para
+phpMyAdmin dentro de database/migrations/.

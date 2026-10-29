@@ -1,0 +1,134 @@
+WHATSAPP -> SOLICITUDES V4
+==========================
+
+OBJETIVO
+--------
+Permitir que una asesora convierta directamente un cliente/perfilamiento de
+WhatsApp en una Solicitud formal, sin volver a capturar la información que el
+bot ya obtuvo.
+
+FLUJO
+-----
+1. El cliente conversa con el bot y completa uno o varios perfilamientos.
+2. El sistema mantiene al cliente asignado a una asesora mediante la lógica
+   de asignación automática ya existente.
+3. La asesora abre /whatsapp y entra al chat del cliente.
+4. En la columna de contexto aparece "Iniciar trámite formal".
+5. Cada trámite perfilado aparece por separado.
+6. Si el cliente indicó "Sí, quiero continuar", aparece el indicador
+   "Cliente quiere continuar".
+7. La asesora selecciona el formulario correcto cuando existe más de uno
+   (por ejemplo, Visa Americana con/sin traslado).
+8. Al presionar "Crear solicitud":
+   - se crea un folio nuevo;
+   - la Solicitud queda a nombre de la misma asesora asignada en WhatsApp;
+   - se precargan nombre, teléfono y datos seguros del formulario;
+   - se conserva todo el perfilamiento del bot como snapshot;
+   - se vincula el chat original con el expediente;
+   - se inicializa el estado financiero;
+   - la Solicitud aparece automáticamente en la cartera de esa asesora y
+     también en "Registrar ventas".
+9. Si ese perfilamiento ya fue convertido, el sistema NO crea otro expediente:
+   muestra "Solicitud creada" y el botón cambia a "Abrir solicitud".
+10. Si el cliente tiene dos trámites distintos, cada perfilamiento puede
+    convertirse de manera independiente sin borrar el anterior.
+
+FORMULARIOS COMPATIBLES
+-----------------------
+El sistema busca únicamente formularios PUBLICADOS que correspondan al
+servicio del bot:
+
+01 Visa USA Primera Vez -> Visa Americana / Primera vez
+02 Visa USA Renovación  -> Visa Americana / Renovación
+03 Pasaporte Mexicano   -> Pasaporte Mexicano
+04 Pasaporte Americano  -> Pasaporte Americano / Estadounidense
+05 Visa Canadá          -> Visa Canadiense
+06 eTA Canadá           -> ETA Canadiense
+07 Visa Australia       -> Visa Australia
+08 Visa China           -> Visa China
+
+Para Pasaportes y Visa Canadá también se intenta respetar Primera vez /
+Renovación de acuerdo con el perfilamiento. Si no existe un formulario
+publicado compatible, la asesora verá el aviso y no se creará un expediente
+incorrecto.
+
+El servicio Acta de Nacimiento no se convierte automáticamente porque el
+esquema actual de Solicitudes no dispone de un tipo/formulario formal
+compatible para ese servicio.
+
+DATOS PRECARGADOS
+-----------------
+La nueva solicitud recibe automáticamente, cuando estén disponibles:
+- Nombre completo.
+- Nombre(s) y apellidos (separación automática revisable).
+- Teléfono de WhatsApp.
+- Correo electrónico, si el bot lo obtuvo.
+- Motivo de viaje cuando coincide con un campo seguro del formulario.
+- Respuestas completas del perfilamiento.
+- Perfil estructurado de Visa USA.
+- Número y datos disponibles de solicitantes.
+- Origen: WhatsApp / Bot.
+- ID del contacto, conversación y servicio de origen.
+- Asesora asignada.
+
+Los datos completos del bot se guardan también en bot_application_links.prefill_json,
+por lo que no se pierden aunque después el cliente complete su formulario formal.
+
+PERMISOS
+--------
+ASESOR:
+- Sólo puede convertir conversaciones que estén asignadas a su propia cuenta.
+- La solicitud creada queda con created_by = asesora asignada.
+
+ADMINISTRADOR:
+- Puede convertir una conversación visible, pero la Solicitud se asigna a la
+  asesora que ya tiene el cliente en WhatsApp.
+- Si no existe asesora asignada, el sistema no permite formalizar hasta que
+  exista una asignación válida.
+
+INSTALACIÓN
+-----------
+1. Haga respaldo de archivos y base de datos.
+2. Ejecute UNA VEZ:
+   database/migrations/08_whatsapp_a_solicitudes_v4.sql
+3. Suba/reemplace los archivos del paquete.
+4. No requiere desplegar Firebase ni modificar el bot.
+5. Ingrese a /whatsapp y pruebe con un cliente asignado.
+
+PRUEBA RECOMENDADA
+------------------
+1. Use un contacto del bot que tenga un perfilamiento de Visa Americana.
+2. Ingrese como la asesora asignada.
+3. Abra WhatsApp -> cliente.
+4. En "Iniciar trámite formal", seleccione el formulario correcto.
+5. Presione "Crear solicitud".
+6. Debe abrirse automáticamente el expediente nuevo.
+7. Verifique:
+   - origen WhatsApp / Bot;
+   - nombre y teléfono;
+   - respuestas del perfilamiento;
+   - responsable = asesora asignada.
+8. Regrese a Solicitudes: debe aparecer el expediente con badge "WhatsApp".
+9. Entre a Registrar ventas: el mismo expediente debe aparecer para esa asesora.
+10. Regrese al chat: ahora debe aparecer "Solicitud creada" y "Abrir solicitud".
+11. Presionar nuevamente no debe crear un duplicado.
+
+ARCHIVOS MODIFICADOS
+--------------------
+- app/controllers/WhatsAppController.php
+- app/controllers/Router.php
+- app/controllers/ApplicationController.php
+- app/views/whatsapp/index.php
+- app/views/applications/show.php
+- app/views/applications/index.php
+- database/migrations/08_whatsapp_a_solicitudes_v4.sql
+
+SEGURIDAD / INTEGRIDAD
+----------------------
+- Usa CSRF en la conversión.
+- Valida que el perfilamiento pertenezca al contacto.
+- Valida que el formulario esté publicado y sea compatible con el servicio.
+- Valida que la asesora asignada esté activa.
+- Usa vínculo único contacto + servicio para evitar duplicados.
+- No borra conversaciones, respuestas del bot ni solicitudes anteriores.
+- Registra evento en el historial de conversación y en el Centro de Control.

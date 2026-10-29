@@ -1,0 +1,78 @@
+CRM VISAS — BALANCE SEMANAL / CONTROL FINANCIERO
+=================================================
+
+ANTES DE INSTALAR
+1. Realiza respaldo de la base de datos y de los archivos actuales de la intranet.
+2. Ejecuta PRIMERO:
+   database/migrations/add_weekly_balance_module.sql
+3. Después sustituye/sube los archivos incluidos en este paquete respetando sus rutas.
+4. Verifica que PHP tenga permiso de escritura sobre:
+   storage/finance/evidence
+   La carpeta se crea automáticamente al adjuntar la primera evidencia, pero el usuario del servidor web debe poder escribir dentro de /storage.
+
+QUÉ SE AGREGÓ
+- Nueva pestaña: Balance Semanal.
+- Selector de semana y consulta de históricos.
+- Ingresos separados por Efectivo, Transferencia y Terminal/Tarjeta.
+- Egresos y resultado semanal.
+- Cuentas por cobrar.
+- Control físico de sobres y Caja Libre.
+- Arqueo teórico vs. contado con faltante/sobrante y observación obligatoria cuando hay diferencia.
+- Arrastre automático: el efectivo contado de una semana cerrada pasa a ser el saldo inicial de la siguiente.
+- Historial de movimientos por sobre; los saldos no se editan directamente.
+- Alta y cierre de sobres sin borrar históricos.
+- Registro de pagos por cliente/servicio y pagos divididos en varias formas de pago.
+- Todo pago en efectivo exige indicar sobre o Caja Libre.
+- Búsqueda de historial de pagos por cliente.
+- Evidencias JPG/PNG/PDF en los arqueos.
+- Cierre semanal y bloqueo del periodo.
+- Correcciones de semanas cerradas sólo durante autorización temporal de Administrador; quedan en bitácora.
+- Reporte PDF del Balance Semanal.
+- Dashboard y Reportes/Estadísticas actualizados con los nuevos ingresos, egresos y formas de pago.
+
+PERMISOS
+- Gerente: registrar movimientos/pagos, realizar arqueos, crear/cerrar sobres y cerrar semana.
+- Administrador: todo lo anterior + autorizar correcciones de periodos cerrados y consultar bitácora.
+- Asesor: conserva su módulo de ingresos adicionales, pero ahora cada nuevo ingreso exige cliente, servicio y forma de pago; el efectivo exige destino físico.
+
+IMPORTANTE SOBRE LOS SOBRES INICIALES
+La migración crea únicamente "CAJA LIBRE" con saldo inicial $0.00.
+Los fondos reales (Ahorro, Traslados, Aguinaldos, Renta, Copias, DHL, Caja/Honorarios, etc.) deben crearse desde Balance Semanal con el saldo físico correcto al momento de comenzar a usar el módulo.
+Esto evita inventar o duplicar saldos históricos.
+
+PAGOS HISTÓRICOS
+Los pagos antiguos siguen apareciendo en los totales de ingresos. Si tienen una forma de pago antigua/no estandarizada (por ejemplo "Sistema"), se muestran como "Otro / Sin clasificar".
+No se puede inferir automáticamente en qué sobre físico se guardó efectivo histórico. Por eso el saldo inicial de cada sobre debe capturarse con el efectivo real existente al iniciar el nuevo control.
+
+CAJA LIBRE
+"CAJA LIBRE" funciona como un contenedor físico del sistema para efectivo que no está dentro de un sobre. Se muestra separado de "Efectivo en sobres", pero ambos forman el total de efectivo físico de oficina.
+
+CIERRE SEMANAL
+- Antes de cerrar, todos los sobres y Caja Libre deben tener efectivo contado.
+- Si existe diferencia, la observación es obligatoria.
+- Una vez cerrada la semana, sus movimientos quedan bloqueados.
+- El Administrador puede autorizar una corrección durante 30 minutos.
+- Cualquier movimiento realizado sobre un periodo cerrado autorizado se registra en la bitácora.
+
+ESTADÍSTICAS
+- Dashboard: resumen de la semana actual (efectivo, transferencias, terminal/tarjeta, ingresos, egresos, resultado, cuentas por cobrar y diferencia de arqueo).
+- Reportes y Estadísticas: flujo financiero del periodo seleccionado.
+- Balance Semanal: detalle completo y reporte PDF por semana.
+
+ARCHIVOS PRINCIPALES NUEVOS
+- app/controllers/WeeklyBalanceController.php
+- app/views/weekly-balance/index.php
+- app/views/weekly-balance/envelope.php
+- app/lib/SimplePdf.php
+- database/migrations/add_weekly_balance_module.sql
+
+NOTA DE PRUEBA RECOMENDADA
+Antes de usar datos reales:
+1. Crea 2 sobres de prueba.
+2. Registra un pago dividido: una parte Transferencia y otra Efectivo.
+3. Confirma que sólo la parte Efectivo aumente el sobre.
+4. Registra un egreso en efectivo desde un sobre.
+5. Realiza el arqueo con una pequeña diferencia y confirma que exija observación.
+6. Cierra la semana.
+7. Abre la siguiente semana y verifica que el efectivo contado sea el saldo anterior.
+8. Verifica que no permita modificar la semana cerrada sin autorización de Administrador.

@@ -1,0 +1,296 @@
+CRM VISAS V5.0 — FLUJO FINAL FINANCIERO
+========================================
+
+BASE
+----
+Esta versión parte de CRMVisas V4.3 (ventas múltiples + abonos de asesora).
+
+OBJETIVO
+--------
+Conectar de forma definitiva:
+
+WhatsApp -> Solicitud -> Cuestionario/Pasaporte -> Hoja de Información
+-> Venta pendiente -> Validación Gerencia -> 3 cuentas
+-> Abonos -> Egresos -> Balance Semanal -> Resumen Mensual / Ahorro.
+
+1. SOLICITUDES / ASESORA
+------------------------
+- La asesora puede ver las respuestas completas del cuestionario igual que
+  Gerencia/Administración.
+- La asesora puede VER el pasaporte y archivos del cuestionario inline.
+- La ruta de descarga continúa restringida a Admin/Gerente.
+- Se corrigió el MIME de "Ver documento" para evitar que la vista se fuerce
+  como descarga cuando el archivo es JPG/PNG/WEBP/PDF.
+
+2. HOJA DE INFORMACIÓN -> VENTA FORMAL
+---------------------------------------
+Para Visa, Pasaporte y trámites formales:
+
+- La asesora abre la Solicitud.
+- Llena Hoja de Información.
+- Selecciona el trámite/servicio.
+- Captura cantidad.
+- Captura manualmente el total del trámite.
+- Captura pago inicial dividido únicamente en:
+  * Efectivo
+  * Terminal
+  * Transferencia
+- Guarda.
+
+Al guardar:
+- Se conserva el folio automático del expediente VISA-...
+- Se genera internamente la venta.
+- La venta queda PENDIENTE DE APROBACIÓN.
+- Los pagos iniciales quedan PENDIENTES.
+- Se abre automáticamente la Nota de Remisión para imprimir.
+
+Una venta aprobada protege servicio, total y formas de pago para conservar
+la auditoría. Los datos generales de la Hoja sí pueden seguir corrigiéndose.
+
+3. NOTA DE REMISIÓN / HOJA DE PAGO
+-----------------------------------
+Se agregó una Nota de Remisión imprimible basada en el formato proporcionado.
+
+Incluye:
+- Logo.
+- Folio del expediente.
+- Fecha.
+- Nombre del cliente.
+- Teléfono.
+- Asesora.
+- Servicio.
+- Cantidad.
+- Precio unitario calculado.
+- Importe total.
+- Total recibido.
+- Saldo pendiente.
+- Desglose Efectivo / Terminal / Transferencia.
+- Referencia / folio.
+- Observaciones.
+- Líneas de firma.
+- Aviso administrativo.
+
+La Nota refleja el PAGO INICIAL registrado en Hoja de Información.
+Los abonos posteriores permanecen en el historial financiero sin reescribir
+la nota inicial.
+
+4. REGISTRAR VENTAS MANUALES
+-----------------------------
+Registrar ventas queda destinado a servicios rápidos que no requieren
+Solicitud formal, por ejemplo:
+- Actas de nacimiento.
+- Copias.
+- Impresiones.
+- Actualizaciones.
+- Digitalización.
+- Servicios administrativos.
+
+La asesora puede:
+- Buscar un cliente con expediente.
+- Buscar un cliente rápido existente.
+- Registrar un cliente nuevo únicamente para esa venta.
+
+Los clientes rápidos reciben folio automático CLI-AAAA-NNNNNN.
+
+5. ABONOS
+---------
+Después de que Gerencia aprueba una venta:
+
+- Si existe saldo, la asesora ve "Registrar abono".
+- Captura importe, método, fecha, referencia, comprobante y observaciones.
+- Sólo puede usar Efectivo, Terminal o Transferencia.
+- El abono queda pendiente.
+- No reduce el saldo confirmado hasta que Gerencia lo valida.
+- El sistema descuenta cualquier pago pendiente del importe máximo que la
+  asesora puede volver a reportar para evitar duplicados.
+
+6. CONTROL DE INGRESOS
+-----------------------
+Admin/Gerente ve:
+
+A) Ventas pendientes de aprobación.
+   - Aprobar venta.
+   - Rechazar venta con motivo.
+
+Al aprobar una venta:
+- Sus pagos iniciales se validan.
+- El dinero se envía automáticamente a la cuenta correspondiente.
+
+B) Abonos posteriores pendientes.
+   - Validar.
+   - Rechazar.
+
+C) Saldos de las 3 cuentas:
+   - Efectivo / Ahorro.
+   - Terminal.
+   - Transferencia.
+
+D) Catálogo Maestro:
+   - Crear.
+   - Editar.
+   - Activar.
+   - Suspender.
+   - Desactivar.
+   - Elegir canal:
+     SOLICITUD = Hoja de Información.
+     MANUAL = Registrar ventas.
+     AMBOS = disponible en ambos.
+
+Los conceptos de precio variable pueden estar activos sin precio fijo;
+el total de un trámite formal se captura manualmente en Hoja de Información.
+
+7. EGRESOS
+----------
+- Sólo el rol GERENTE puede registrar egresos.
+- Admin/Dirección puede consultarlos.
+- Todo egreso se descuenta EXCLUSIVAMENTE de Efectivo.
+- Campos:
+  * Concepto.
+  * Importe.
+  * Referencia.
+  * Evidencia obligatoria.
+  * Observaciones.
+- Fecha, hora, usuario y folio EGR-AAAA-NNNNNN son automáticos.
+- El sistema impide registrar un egreso mayor al efectivo disponible.
+
+8. TRES CUENTAS
+---------------
+El sistema mantiene automáticamente:
+
+EFECTIVO
+TERMINAL
+TRANSFERENCIA
+
+Un ingreso validado entra a la cuenta correspondiente.
+Un egreso sale sólo de EFECTIVO.
+
+Ahorro = saldo acumulado de EFECTIVO.
+
+9. BALANCE SEMANAL
+------------------
+- Lunes a viernes.
+- Sin botones PDF/Excel.
+- No puede cerrarse antes del viernes.
+- No puede cerrarse si hay ventas/pagos pendientes de revisión.
+- Muestra:
+  * Ventas de la semana.
+  * Ingresos validados.
+  * Egresos.
+  * Resultado semanal.
+  * Saldo esperado en Efectivo.
+  * Saldo esperado en Terminal.
+  * Saldo esperado en Transferencia.
+  * Ingresos por método.
+  * Ventas por asesora.
+  * Ventas por servicio.
+  * Detalle de ingresos.
+  * Detalle de egresos.
+  * Cuentas por cobrar.
+
+10. VENTAS POR QUINCENA / ASESORA
+----------------------------------
+Nueva vista "Mis ventas por quincena".
+
+- Periodo predeterminado: 1-15 o 16-fin de mes.
+- Se puede capturar cualquier rango personalizado, por ejemplo 25 Sep - 8 Oct.
+- Agrupa por servicio.
+- Muestra cantidad total y total vendido.
+- Cada servicio puede desplegar la lista de clientes:
+  fecha, cliente, folio, folio venta, cantidad, total.
+- La asesora puede registrar horas extra:
+  fecha, horas y motivo.
+
+11. RESUMEN MENSUAL
+--------------------
+Admin/Gerente puede seleccionar el mes.
+
+Muestra:
+- Total de cada trámite/servicio del mes.
+- Cantidad total.
+- Total vendido.
+- Botón "Ver detalle" por cada tipo de trámite.
+- Detalle: fecha, cliente, folio, asesora, cantidad y total.
+- Ingresos validados del mes:
+  Efectivo / Terminal / Transferencia.
+- Egresos del mes.
+- Resultado mensual = ingresos - egresos.
+- Saldos acumulados al cierre del mes.
+- Ahorro acumulado = EFECTIVO acumulado.
+- Terminal y Transferencia se muestran por separado.
+
+12. MIGRACIÓN
+-------------
+Ejecutar UNA VEZ:
+
+database/migrations/11_flujo_financiero_final_v5.sql
+
+La migración:
+- crea las 3 cuentas y movimientos;
+- crea clientes rápidos;
+- agrega aprobación de ventas;
+- amplía Hoja de Información;
+- crea horas extra;
+- amplía egresos;
+- agrega saldos al cierre semanal;
+- normaliza "Depósito bancario" histórico como Transferencia;
+- conserva datos anteriores.
+
+INSTALACIÓN RECOMENDADA
+-----------------------
+1. Respaldar archivos y base de datos.
+2. Ejecutar 11_flujo_financiero_final_v5.sql.
+3. Subir/reemplazar los archivos del ZIP de ajuste.
+4. Cerrar sesión e ingresar nuevamente.
+5. No requiere desplegar Firebase.
+
+PRUEBA COMPLETA
+---------------
+A. SOLICITUD FORMAL
+1. Entrar como Asesor.
+2. Abrir una Solicitud propia.
+3. Confirmar que puede ver respuestas del cuestionario y pasaporte.
+4. Abrir Hoja de Información.
+5. Elegir "Pasaporte primera vez".
+6. Total: $6,000.
+7. Efectivo: $3,000.
+8. Terminal: $3,000.
+9. Guardar.
+10. Debe abrirse Nota de Remisión lista para imprimir.
+11. Control de Ingresos debe mostrar la venta pendiente.
+12. Gerencia aprueba.
+13. Saldos:
+    Efectivo +$3,000
+    Terminal +$3,000
+    Transferencia +$0.
+
+B. SALDO / ABONO
+1. Crear una venta de $6,000 con pago inicial de $3,000.
+2. Aprobar.
+3. La asesora debe ver saldo $3,000.
+4. Registrar un abono.
+5. Gerencia valida.
+6. El saldo debe disminuir.
+
+C. VENTA MANUAL
+1. Entrar como Asesor -> Registrar ventas.
+2. Elegir Acta/Copias.
+3. Buscar cliente o crear cliente rápido.
+4. Registrar cantidad y pago.
+5. Gerencia aprueba.
+
+D. EGRESO
+1. Entrar como Gerente.
+2. Registrar Internet $500 + evidencia.
+3. Verificar que sólo Efectivo disminuya $500.
+
+E. BALANCE
+1. Verificar lunes-viernes.
+2. Confirmar que no permite cierre antes del viernes.
+3. Revisar ingresos/egresos y las tres cuentas.
+
+F. MENSUAL
+1. Abrir Resumen mensual.
+2. Seleccionar un mes.
+3. Abrir "Ver detalle" de Visa/Pasaporte/Copias.
+4. Revisar el listado completo.
+5. Confirmar Ahorro = Efectivo acumulado.

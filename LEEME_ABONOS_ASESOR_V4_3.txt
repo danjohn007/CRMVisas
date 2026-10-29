@@ -1,0 +1,104 @@
+CRM VISAS V4.3 — ABONOS REPORTADOS POR ASESORAS
+=================================================
+
+OBJETIVO
+--------
+Completar el flujo de cobranza para que la asesora pueda reportar el segundo,
+tercer o último pago de una venta existente sin crear una venta nueva y sin
+tener acceso al módulo administrativo de Control de Ingresos.
+
+FLUJO
+-----
+1. La asesora registra una venta.
+2. El pago inicial queda PENDIENTE DE VALIDACIÓN.
+3. Gerencia valida el pago.
+4. Si existe saldo, en "Mis ventas y saldos de clientes" aparece:
+   + Registrar abono
+5. La asesora captura:
+   - Importe
+   - Método de pago
+   - Fecha
+   - Referencia / folio
+   - Comprobante
+   - Próximo seguimiento
+   - Observaciones
+6. El nuevo pago se guarda como PENDIENTE.
+7. El saldo confirmado NO disminuye todavía.
+8. Gerencia ve ese pago en Control de Ingresos y lo valida o rechaza.
+9. Al validarlo:
+   - aumenta Abonado validado;
+   - disminuye Saldo;
+   - entra al Balance Semanal;
+   - si llega a $0, la venta cambia a LIQUIDADO.
+
+PROTECCIÓN CONTRA DUPLICADOS / EXCESOS
+--------------------------------------
+El sistema calcula:
+Saldo disponible para reportar = Total - pagos validados - pagos pendientes.
+
+Ejemplo:
+Total                $6,520
+Validado              $3,000
+Pendiente validación  $1,000
+Disponible reportar   $2,520
+
+La asesora no puede reportar más de $2,520 mientras exista ese pago pendiente.
+Esto evita que se reporte dinero por encima del total de la venta.
+
+CONCEPTOS AUTOMÁTICOS
+---------------------
+- Un abono parcial se guarda como COB-002 (Segundo abono).
+- Si el pago reportado cubre todo el saldo disponible, se guarda como
+  COB-003 (Liquidación de saldo).
+Gerencia sigue siendo quien confirma si el pago realmente fue recibido.
+
+PERMISOS
+--------
+ASESOR:
+- Sólo puede reportar abonos de ventas pertenecientes a su propia cartera.
+- No puede validarlos.
+- No puede elegir cuenta receptora o sobre de efectivo.
+- No puede modificar pagos validados.
+
+GERENCIA / ADMIN:
+- Continúan validando/rechazando el pago desde Control de Ingresos.
+- Al validar efectivo seleccionan sobre/Caja Libre.
+- Al validar transferencia/depósito/terminal indican cuenta receptora.
+
+CIERRES
+-------
+La asesora no puede reportar un abono con fecha perteneciente a una semana
+financiera ya cerrada.
+
+INSTALACIÓN
+-----------
+Esta actualización parte de CRM VISAS V4.2.
+NO requiere SQL nuevo.
+
+Reemplace únicamente:
+- app/controllers/AdvisorIncomeController.php
+- app/controllers/Router.php
+- app/views/advisor-income/index.php
+
+O utilice el CRM completo V4.3.
+
+PRUEBA RECOMENDADA
+------------------
+1. Venta VTA-... total $6,520.
+2. Tener $3,000 ya validados.
+3. Entrar como Asesor.
+4. En Mis ventas y saldos debe aparecer:
+   Saldo: $3,520
+   [Registrar abono]
+5. Reportar $2,000 por transferencia.
+6. La pantalla debe mostrar:
+   Abonado validado: $3,000
+   Saldo: $3,520
+   Pago en validación: $2,000
+   Saldo disponible para reportar: $1,520
+7. Entrar como Gerente y validar $2,000.
+8. Regresar como Asesor:
+   Abonado validado: $5,000
+   Saldo: $1,520
+9. Reportar $1,520.
+10. Gerencia valida y la venta debe quedar LIQUIDADA.

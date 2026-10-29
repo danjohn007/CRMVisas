@@ -1,208 +1,258 @@
 <?php 
-$title = 'Reportes - CRM Visas';
-$pageTitle = 'Reportes y Estadísticas';
+$title = 'Reportes';
 ob_start(); 
 ?>
 
-<!-- Report Type Selection -->
-<div class="bg-white rounded-lg shadow mb-6 p-6">
-    <div class="flex flex-wrap gap-4 items-center">
-        <select id="reportType" class="px-4 py-2 border border-gray-300 rounded-lg">
-            <option value="dashboard" <?php echo $reportType === 'dashboard' ? 'selected' : ''; ?>>Dashboard General</option>
-            <option value="requests" <?php echo $reportType === 'requests' ? 'selected' : ''; ?>>Reporte de Solicitudes</option>
-            <option value="financial" <?php echo $reportType === 'financial' ? 'selected' : ''; ?>>Reporte Financiero</option>
-            <option value="productivity" <?php echo $reportType === 'productivity' ? 'selected' : ''; ?>>Productividad</option>
-        </select>
+<div class="mb-4 md:mb-6">
+    <h2 class="text-2xl md:text-3xl font-bold text-gray-800">Reportes y Estadísticas</h2>
+    <p class="text-sm md:text-base text-gray-600">Análisis detallado de solicitudes y finanzas</p>
+</div>
+
+<!-- Filtros -->
+<div class="bg-white rounded-lg shadow p-4 md:p-6 mb-4 md:mb-6">
+    <form method="GET" action="<?= BASE_URL ?>/reportes" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
+                <input type="date" name="start_date" value="<?= $startDate ?>"
+                       class="w-full border border-gray-300 rounded-lg px-3 md:px-4 py-2 text-sm md:text-base">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
+                <input type="date" name="end_date" value="<?= $endDate ?>"
+                       class="w-full border border-gray-300 rounded-lg px-3 md:px-4 py-2 text-sm md:text-base">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo</label>
+                <select name="type" class="w-full border border-gray-300 rounded-lg px-3 md:px-4 py-2 text-sm md:text-base">
+                    <option value="">Todos</option>
+                    <option value="Visa" <?= $type === 'Visa' ? 'selected' : '' ?>>Visa</option>
+                    <option value="Pasaporte" <?= $type === 'Pasaporte' ? 'selected' : '' ?>>Pasaporte</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Estatus</label>
+                <select name="status" class="w-full border border-gray-300 rounded-lg px-3 md:px-4 py-2 text-sm md:text-base">
+                    <option value="">Todos</option>
+                    <option value="<?= STATUS_FORMULARIO_RECIBIDO ?>" <?= $status === STATUS_FORMULARIO_RECIBIDO ? 'selected' : '' ?>><?= STATUS_FORMULARIO_RECIBIDO ?></option>
+                    <option value="<?= STATUS_PAGO_VERIFICADO ?>" <?= $status === STATUS_PAGO_VERIFICADO ? 'selected' : '' ?>><?= STATUS_PAGO_VERIFICADO ?></option>
+                    <option value="<?= STATUS_EN_ELABORACION_HOJA ?>" <?= $status === STATUS_EN_ELABORACION_HOJA ? 'selected' : '' ?>><?= STATUS_EN_ELABORACION_HOJA ?></option>
+                    <option value="<?= STATUS_EN_REVISION ?>" <?= $status === STATUS_EN_REVISION ? 'selected' : '' ?>><?= STATUS_EN_REVISION ?></option>
+                    <option value="<?= STATUS_RECHAZADO ?>" <?= $status === STATUS_RECHAZADO ? 'selected' : '' ?>><?= STATUS_RECHAZADO ?></option>
+                    <option value="<?= STATUS_APROBADO ?>" <?= $status === STATUS_APROBADO ? 'selected' : '' ?>><?= STATUS_APROBADO ?></option>
+                    <option value="<?= STATUS_CITA_SOLICITADA ?>" <?= $status === STATUS_CITA_SOLICITADA ? 'selected' : '' ?>><?= STATUS_CITA_SOLICITADA ?></option>
+                    <option value="<?= STATUS_CITA_CONFIRMADA ?>" <?= $status === STATUS_CITA_CONFIRMADA ? 'selected' : '' ?>><?= STATUS_CITA_CONFIRMADA ?></option>
+                    <option value="<?= STATUS_PROCESO_EMBAJADA ?>" <?= $status === STATUS_PROCESO_EMBAJADA ? 'selected' : '' ?>><?= STATUS_PROCESO_EMBAJADA ?></option>
+                    <option value="<?= STATUS_FINALIZADO ?>" <?= $status === STATUS_FINALIZADO ? 'selected' : '' ?>><?= STATUS_FINALIZADO ?></option>
+                </select>
+            </div>
+        </div>
         
-        <input type="date" id="startDate" value="<?php echo $startDate; ?>" class="px-4 py-2 border border-gray-300 rounded-lg">
-        <input type="date" id="endDate" value="<?php echo $endDate; ?>" class="px-4 py-2 border border-gray-300 rounded-lg">
-        
-        <button onclick="loadReport()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-            <i class="fas fa-sync-alt mr-2"></i>Generar Reporte
-        </button>
-        
-        <button id="exportBtn" 
-                class="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
-                aria-label="Exportar reporte a CSV"
-                aria-describedby="exportWarning">
-            <i class="fas fa-download mr-2"></i>Exportar
-        </button>
+        <div class="flex flex-col md:flex-row justify-between gap-4">
+            <button type="submit" class="btn-primary text-white px-4 md:px-6 py-2 rounded-lg hover:opacity-90 text-sm md:text-base">
+                <i class="fas fa-search mr-2"></i>Generar Reporte
+            </button>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <a href="<?= BASE_URL ?>/reportes/exportar?format=csv&start_date=<?= $startDate ?>&end_date=<?= $endDate ?>&type=<?= $type ?>&status=<?= $status ?>" 
+                   class="bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-green-700 inline-block text-center text-sm md:text-base">
+                    <i class="fas fa-file-csv mr-2"></i>Exportar CSV
+                </a>
+                <a href="<?= BASE_URL ?>/reportes/exportar?format=excel&start_date=<?= $startDate ?>&end_date=<?= $endDate ?>&type=<?= $type ?>&status=<?= $status ?>" 
+                   class="bg-green-600 text-white px-3 md:px-4 py-2 rounded-lg hover:bg-green-700 inline-block text-center text-sm md:text-base">
+                    <i class="fas fa-file-excel mr-2"></i>Exportar Excel
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Resumen Financiero -->
+<?php if (isset($financial)): ?>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+    <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-gray-600 text-xs md:text-sm">Total Costos</p>
+                <p class="text-2xl md:text-3xl font-bold text-primary truncate">$<?= number_format($financial['total_costs'] ?? 0, 2) ?></p>
+            </div>
+            <i class="fas fa-dollar-sign text-3xl md:text-4xl text-gray-200 flex-shrink-0 ml-2"></i>
+        </div>
     </div>
     
-    <!-- Export warning message (hidden by default) -->
-    <div id="exportWarning" class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800 text-sm hidden">
-        <i class="fas fa-info-circle mr-2"></i>
-        El reporte de Dashboard no se puede exportar. Por favor seleccione otro tipo de reporte (Solicitudes, Financiero o Productividad).
+    <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-gray-600 text-xs md:text-sm">Total Pagado</p>
+                <p class="text-2xl md:text-3xl font-bold text-green-600 truncate">$<?= number_format($financial['total_paid'] ?? 0, 2) ?></p>
+            </div>
+            <i class="fas fa-check-circle text-3xl md:text-4xl text-green-200 flex-shrink-0 ml-2"></i>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow p-4 md:p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex-1 min-w-0">
+                <p class="text-gray-600 text-xs md:text-sm">Saldo Pendiente</p>
+                <p class="text-2xl md:text-3xl font-bold text-red-600 truncate">$<?= number_format($financial['total_balance'] ?? 0, 2) ?></p>
+            </div>
+            <i class="fas fa-exclamation-circle text-3xl md:text-4xl text-red-200 flex-shrink-0 ml-2"></i>
+        </div>
     </div>
 </div>
 
-<!-- Report Content -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <?php if ($reportType === 'dashboard'): ?>
-        <!-- Requests by Status Chart -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-semibold mb-4">Solicitudes por Estado</h3>
-            <canvas id="statusChart"></canvas>
-        </div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-4 md:mb-6">
+    <div class="bg-white rounded-lg shadow p-4 md:p-6 text-center">
+        <p class="text-gray-600 text-xs md:text-sm mb-2">Pagado</p>
+        <p class="text-xl md:text-2xl font-bold text-green-600"><?= $financial['pagado_count'] ?? 0 ?></p>
+        <p class="text-xs text-gray-500">solicitudes</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 md:p-6 text-center">
+        <p class="text-gray-600 text-xs md:text-sm mb-2">Pago Parcial</p>
+        <p class="text-xl md:text-2xl font-bold text-yellow-600"><?= $financial['parcial_count'] ?? 0 ?></p>
+        <p class="text-xs text-gray-500">solicitudes</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-4 md:p-6 text-center">
+        <p class="text-gray-600 text-xs md:text-sm mb-2">Pendiente</p>
+        <p class="text-xl md:text-2xl font-bold text-red-600"><?= $financial['pendiente_count'] ?? 0 ?></p>
+        <p class="text-xs text-gray-500">solicitudes</p>
+    </div>
+</div>
+<?php endif; ?>
 
-        <!-- Revenue Trend Chart -->
-        <div class="bg-white rounded-lg shadow p-6">
-            <h3 class="text-lg font-semibold mb-4">Tendencia de Ingresos</h3>
-            <canvas id="revenueChart"></canvas>
+<?php if (isset($cashFlow)): ?>
+<div class="bg-white rounded-lg shadow p-5 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <div>
+            <h3 class="text-lg font-bold text-gray-800">Estadísticas de Ingresos</h3>
+            <p class="text-sm text-gray-500">Los importes recibidos incluyen únicamente pagos validados por Gerencia.</p>
         </div>
-    <?php elseif ($reportType === 'productivity'): ?>
-        <!-- Productivity Report -->
-        <div class="col-span-full bg-white rounded-lg shadow">
-            <div class="p-6 border-b">
-                <h3 class="text-lg font-semibold">Productividad por Asesor</h3>
+        <a href="<?= BASE_URL ?>/control-ingresos" class="px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold">Ver Control de Ingresos</a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="rounded-lg border border-indigo-100 bg-indigo-50 p-3">
+            <p class="text-xs text-indigo-700 font-semibold uppercase">Ventas contratadas</p>
+            <p class="text-lg font-bold text-indigo-800">$<?= number_format($cashFlow['sales_amount'] ?? 0, 2) ?></p>
+            <p class="text-xs text-indigo-600"><?= (int)($cashFlow['sales_count'] ?? 0) ?> ventas</p>
+        </div>
+        <div class="rounded-lg border border-green-100 bg-green-50 p-3">
+            <p class="text-xs text-green-700 font-semibold uppercase">Efectivo</p>
+            <p class="text-lg font-bold text-green-800">$<?= number_format($cashFlow['cash'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-blue-100 bg-blue-50 p-3">
+            <p class="text-xs text-blue-700 font-semibold uppercase">Transferencia</p>
+            <p class="text-lg font-bold text-blue-800">$<?= number_format($cashFlow['transfer'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-purple-100 bg-purple-50 p-3">
+            <p class="text-xs text-purple-700 font-semibold uppercase">Terminal</p>
+            <p class="text-lg font-bold text-purple-800">$<?= number_format($cashFlow['terminal'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-red-100 bg-red-50 p-3">
+            <p class="text-xs text-red-700 font-semibold uppercase">Egresos</p>
+            <p class="text-lg font-bold text-red-800">$<?= number_format($cashFlow['expenses'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <p class="text-xs text-gray-700 font-semibold uppercase">Ingresos validados</p>
+            <p class="text-lg font-bold text-gray-800">$<?= number_format($cashFlow['income'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-emerald-100 bg-emerald-50 p-3">
+            <p class="text-xs text-emerald-700 font-semibold uppercase">Resultado</p>
+            <p class="text-lg font-bold <?= ($cashFlow['net'] ?? 0)>=0?'text-emerald-800':'text-red-800' ?>">$<?= number_format($cashFlow['net'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-red-100 bg-red-50 p-3">
+            <p class="text-xs text-red-700 font-semibold uppercase">Cuentas por cobrar</p>
+            <p class="text-lg font-bold text-red-800">$<?= number_format($cashFlow['receivables'] ?? 0, 2) ?></p>
+        </div>
+        <div class="rounded-lg border border-amber-100 bg-amber-50 p-3">
+            <p class="text-xs text-amber-700 font-semibold uppercase">Pendiente de validar</p>
+            <p class="text-lg font-bold text-amber-800">$<?= number_format($cashFlow['pending_validation'] ?? 0, 2) ?></p>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+<!-- Resumen por Tipo y Estatus -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 mb-4 md:mb-6">
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-4 md:p-6 border-b">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800">Solicitudes por Tipo y Estatus</h3>
+        </div>
+        <div class="p-4 md:p-6">
+            <div class="space-y-3">
+                <?php if (!empty($summary)): ?>
+                    <?php foreach ($summary as $item): ?>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <div class="flex-1 min-w-0">
+                            <span class="font-medium text-gray-700 text-sm md:text-base"><?= htmlspecialchars($item['type']) ?></span>
+                            <span class="text-gray-500"> - </span>
+                            <span class="text-xs md:text-sm text-gray-600"><?= htmlspecialchars($item['status']) ?></span>
+                        </div>
+                        <span class="bg-primary text-white px-3 py-1 rounded-full text-sm font-bold ml-2 flex-shrink-0">
+                            <?= $item['total_applications'] ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-center text-gray-500 py-4 text-sm md:text-base">No hay datos para mostrar</p>
+                <?php endif; ?>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asesor</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rol</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Solicitudes</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Completadas</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tasa de Éxito</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        <?php if (is_array($data) && !empty($data)): ?>
-                            <?php foreach ($data as $row): ?>
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 font-semibold"><?php echo htmlspecialchars($row['full_name']); ?></td>
-                                    <td class="px-6 py-4 capitalize"><?php echo htmlspecialchars($row['role']); ?></td>
-                                    <td class="px-6 py-4 text-center font-bold"><?php echo $row['total_requests']; ?></td>
-                                    <td class="px-6 py-4 text-center text-green-600 font-bold"><?php echo $row['completed_requests']; ?></td>
-                                    <td class="px-6 py-4 text-center">
-                                        <?php 
-                                        $rate = $row['total_requests'] > 0 ? ($row['completed_requests'] / $row['total_requests'] * 100) : 0;
-                                        ?>
-                                        <span class="px-3 py-1 rounded-full text-xs font-medium <?php echo $rate >= 80 ? 'bg-green-100 text-green-800' : ($rate >= 50 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'); ?>">
-                                            <?php echo number_format($rate, 1); ?>%
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-gray-500">No hay datos disponibles</td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow">
+        <div class="p-4 md:p-6 border-b">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800">Top Asesores</h3>
+        </div>
+        <div class="p-4 md:p-6">
+            <div class="space-y-3">
+                <?php if (!empty($topAdvisors)): ?>
+                    <?php foreach ($topAdvisors as $advisor): ?>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded">
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-gray-700 text-sm md:text-base truncate"><?= htmlspecialchars($advisor['full_name']) ?></p>
+                            <p class="text-xs text-gray-500">
+                                <?= $advisor['finalizadas'] ?> finalizadas de <?= $advisor['total_applications'] ?>
+                            </p>
+                        </div>
+                        <span class="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold ml-2 flex-shrink-0">
+                            <?= $advisor['total_applications'] ?>
+                        </span>
+                    </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p class="text-center text-gray-500 py-4 text-sm md:text-base">No hay datos para mostrar</p>
+                <?php endif; ?>
             </div>
         </div>
-    <?php else: ?>
-        <div class="col-span-full bg-white rounded-lg shadow p-6">
-            <p class="text-gray-500 text-center">Seleccione un tipo de reporte y haga clic en "Generar Reporte"</p>
-        </div>
-    <?php endif; ?>
+    </div>
 </div>
 
-<script>
-function loadReport() {
-    const type = document.getElementById('reportType').value;
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    window.location.href = `<?php echo BASE_URL; ?>/public/index.php?page=reports&type=${type}&start_date=${startDate}&end_date=${endDate}`;
-}
-
-function exportReport() {
-    const type = document.getElementById('reportType').value;
-    const exportWarning = document.getElementById('exportWarning');
-    
-    // Dashboard cannot be exported
-    if (type === 'dashboard') {
-        // Show warning message
-        exportWarning.classList.remove('hidden');
-        // Hide after 5 seconds
-        setTimeout(() => {
-            exportWarning.classList.add('hidden');
-        }, 5000);
-        return;
-    }
-    
-    // Hide warning if visible
-    exportWarning.classList.add('hidden');
-    
-    const startDate = document.getElementById('startDate').value;
-    const endDate = document.getElementById('endDate').value;
-    const format = 'csv';
-    
-    // Build export URL
-    const url = `<?php echo BASE_URL; ?>/public/index.php?page=reports&action=export&type=${type}&start_date=${startDate}&end_date=${endDate}&format=${format}`;
-    
-    // Open in new window to trigger download
-    window.location.href = url;
-}
-
-// Update export button state when report type changes
-document.addEventListener('DOMContentLoaded', function() {
-    const reportType = document.getElementById('reportType');
-    const exportBtn = document.getElementById('exportBtn');
-    const exportWarning = document.getElementById('exportWarning');
-    
-    function updateExportButton() {
-        if (reportType.value === 'dashboard') {
-            exportBtn.disabled = true;
-            exportBtn.classList.add('opacity-50', 'cursor-not-allowed');
-            exportBtn.classList.remove('hover:bg-green-700');
-        } else {
-            exportBtn.disabled = false;
-            exportBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-            exportBtn.classList.add('hover:bg-green-700');
-            exportWarning.classList.add('hidden');
-        }
-    }
-    
-    // Add click handler for export button
-    exportBtn.addEventListener('click', exportReport);
-    
-    reportType.addEventListener('change', updateExportButton);
-    updateExportButton(); // Initialize on page load
-});
-
-<?php if ($reportType === 'dashboard' && isset($data['requestsByStatus'])): ?>
-// Status Chart
-const statusCtx = document.getElementById('statusChart').getContext('2d');
-new Chart(statusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: <?php echo json_encode(array_column($data['requestsByStatus'], 'status')); ?>,
-        datasets: [{
-            data: <?php echo json_encode(array_column($data['requestsByStatus'], 'count')); ?>,
-            backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
-        }]
-    }
-});
-
-// Revenue Chart
-<?php if (isset($data['revenueTrend'])): ?>
-const revenueCtx = document.getElementById('revenueChart').getContext('2d');
-new Chart(revenueCtx, {
-    type: 'line',
-    data: {
-        labels: <?php echo json_encode(array_column($data['revenueTrend'], 'date')); ?>,
-        datasets: [{
-            label: 'Ingresos',
-            data: <?php echo json_encode(array_column($data['revenueTrend'], 'total')); ?>,
-            borderColor: '#10b981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true
-    }
-});
+<!-- Gráfico por Día -->
+<?php if (!empty($byDay)): ?>
+<div class="bg-white rounded-lg shadow">
+    <div class="p-4 md:p-6 border-b">
+        <h3 class="text-lg md:text-xl font-bold text-gray-800">Solicitudes por Día</h3>
+    </div>
+    <div class="p-4 md:p-6">
+        <div class="space-y-2">
+            <?php foreach ($byDay as $day): ?>
+            <div class="flex items-center">
+                <span class="text-xs md:text-sm text-gray-600 w-20 md:w-32 flex-shrink-0"><?= date('d/m/Y', strtotime($day['date'])) ?></span>
+                <div class="flex-1 ml-2 md:ml-4">
+                    <div class="bg-blue-200 rounded-full h-6 flex items-center" style="width: <?= min(100, ($day['count'] * 10)) ?>%">
+                        <span class="ml-2 md:ml-3 text-xs font-medium text-blue-800"><?= $day['count'] ?></span>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
 <?php endif; ?>
-<?php endif; ?>
-</script>
 
 <?php 
 $content = ob_get_clean();
-require_once __DIR__ . '/../layouts/main.php';
+require ROOT_PATH . '/app/views/layouts/main.php';
 ?>

@@ -1,26 +1,64 @@
-# Configuration files with sensitive data
-config/database.php
-
-# Upload directories
-public/uploads/*
-!public/uploads/.gitkeep
-
-# System files
+# Ignorar archivos de sistema
 .DS_Store
 Thumbs.db
-*.log
+desktop.ini
 
-# IDE files
-.vscode/
-.idea/
+# Ignorar archivos de editor
 *.swp
 *.swo
 *~
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
 
-# Temporary files
-/tmp/*
-!tmp/.gitkeep
+# Ignorar logs
+error.log
+*.log
+logs/
 
-# Cache
-cache/*
-!cache/.gitkeep
+# Ignorar archivos temporales
+tmp/
+temp/
+*.tmp
+
+# Ignorar archivos de configuración local (descomentar si es necesario)
+# config/config.php
+# config/database.php
+
+# Ignorar archivos subidos por usuarios
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/.htaccess
+
+# Ignorar caché y archivos de sesión
+cache/
+sessions/
+
+# Ignorar node_modules si se usan herramientas de build
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Las dependencias de composer se incluyen en el proyecto (requerido para cPanel)
+# vendor/ y composer.lock se rastrean intencionalmente
+
+# Ignorar archivos de respaldo
+*.bak
+*.backup
+*.old
+
+# Ignorar archivos de base de datos
+*.sql.gz
+*.sql.zip
+backup/
+
+# Ignorar archivos de entorno
+.env
+.env.local
+.env.*.local
+
+# Ignorar archivos de sistema de control de versiones
+.git/
+.svn/
+config/whatsapp.local.php

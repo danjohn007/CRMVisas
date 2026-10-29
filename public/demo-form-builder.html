@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Form Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-builder {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-6">
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Demo - Constructor de Formularios con Drag & Drop</h1>
+            <p class="text-gray-600">Esta es una demostración del nuevo constructor visual de formularios</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <form id="demo-form">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Nombre del Formulario <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" name="name" required
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                               placeholder="Ej: Visa Americana - Primera Vez">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                        <textarea name="description" rows="2"
+                                  class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500"
+                                  placeholder="Descripción opcional del formulario"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tipo <span class="text-red-500">*</span>
+                        </label>
+                        <select name="type" required class="w-full border border-gray-300 rounded-lg px-4 py-2">
+                            <option value="">Seleccione...</option>
+                            <option value="Visa">Visa</option>
+                            <option value="Pasaporte">Pasaporte</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Subtipo</label>
+                        <input type="text" name="subtype"
+                               class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                               placeholder="Ej: Primera Vez, Renovación">
+                    </div>
+                    
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Campos del Formulario <span class="text-red-500">*</span>
+                        </label>
+                        
+                        <!-- Visual Form Builder -->
+                        <div id="form-builder-container" data-initial-data=""></div>
+                        
+                        <!-- Hidden field to store JSON -->
+                        <input type="hidden" name="fields_json" id="fields_json_hidden" required>
+                        
+                        <p class="text-sm text-gray-500 mt-2">
+                            <i class="fas fa-info-circle"></i> Arrastra y suelta campos para construir tu formulario
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 flex justify-end space-x-4">
+                    <button type="button" onclick="showJSON()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        <i class="fas fa-code mr-2"></i>Ver JSON
+                    </button>
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <i class="fas fa-save mr-2"></i>Guardar Formulario
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- JSON Preview Modal -->
+        <div id="json-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full mx-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">JSON Generado</h3>
+                    <button onclick="closeJSON()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
+                </div>
+                <pre id="json-preview" class="bg-gray-100 p-4 rounded-lg overflow-auto max-h-96 text-sm font-mono"></pre>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="closeJSON()" class="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/form-builder.js"></script>
+    <script>
+        function showJSON() {
+            const jsonField = document.getElementById('fields_json_hidden');
+            const modal = document.getElementById('json-modal');
+            const preview = document.getElementById('json-preview');
+            
+            if (jsonField.value) {
+                try {
+                    const formatted = JSON.stringify(JSON.parse(jsonField.value), null, 2);
+                    preview.textContent = formatted;
+                } catch (e) {
+                    preview.textContent = '// Error al parsear JSON: ' + e.message;
+                }
+            } else {
+                preview.textContent = '// No hay campos definidos aún';
+            }
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+        
+        function closeJSON() {
+            const modal = document.getElementById('json-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        
+        document.getElementById('demo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Formulario enviado! Revisa el JSON generado con el botón "Ver JSON"');
+            showJSON();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+CRM VISAS - AJUSTE FINANCIERO V2
+
+OBJETIVO
+Simplificar el flujo financiero y evitar capturas duplicadas.
+
+CAMBIOS PRINCIPALES
+1. Se oculta del menu la vista redundante "Modulo Financiero".
+   - La ruta /financiero redirige a /ingresos-egresos por compatibilidad.
+2. "Ingresos vs Egresos" pasa a llamarse visualmente "Ingresos y Egresos".
+   - Permite registrar INGRESOS y EGRESOS desde la misma pantalla.
+   - Los ingresos quedan ligados a cliente/solicitud y servicio.
+   - Admite pagos divididos entre efectivo, transferencia y terminal/tarjeta.
+   - Si es efectivo, exige sobre o Caja Libre.
+   - Los egresos en efectivo descuentan automaticamente del sobre/caja seleccionado.
+3. Balance Semanal deja de ser una pantalla de captura diaria.
+   - Toma automaticamente ingresos y egresos ya registrados.
+   - Mantiene sobres, arqueo, cierre, historicos y autorizaciones.
+   - Se elimina de la vista el formulario confuso de movimiento manual de sobre.
+4. PDF del Balance Semanal redisenado.
+   - Encabezado, periodo y estado.
+   - Resumen en bloques.
+   - Ingresos por forma de pago.
+   - Tabla de sobres y arqueo.
+   - Detalle de ingresos y egresos.
+   - Arqueo general, cierre y observaciones.
+
+NO REQUIERE SQL NUEVO
+Este ajuste usa las tablas creadas por add_weekly_balance_module.sql.
+
+ARCHIVOS MODIFICADOS
+- app/controllers/FinancialController.php
+- app/controllers/IncomeExpenseController.php
+- app/controllers/Router.php
+- app/controllers/WeeklyBalanceController.php
+- app/lib/SimplePdf.php
+- app/views/income-expense/index.php
+- app/views/layouts/main.php
+- app/views/weekly-balance/index.php

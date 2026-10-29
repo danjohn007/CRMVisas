@@ -1,215 +1,336 @@
 <?php
-/**
- * Report Controller
- * Manages reports and analytics (RF47-RF49)
- */
+require_once ROOT_PATH . '/app/controllers/BaseController.php';
 
 class ReportController extends BaseController {
     
-    public function __construct() {
-        parent::__construct();
-        $this->requireAuth();
-        $this->requireRole(['admin', 'supervisor']);
-    }
-    
     public function index() {
-        $reportType = $_GET['type'] ?? 'dashboard';
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        
         $startDate = $_GET['start_date'] ?? date('Y-m-01');
-        $endDate = $_GET['end_date'] ?? date('Y-m-t');
+        $endDate = $_GET['end_date'] ?? date('Y-m-d');
+        $type = $_GET['type'] ?? '';
+        $status = $_GET['status'] ?? '';
         
-        $data = [];
-        
-        switch ($reportType) {
-            case 'requests':
-                $data = $this->getRequestsReport($startDate, $endDate);
-                break;
-            case 'financial':
-                $data = $this->getFinancialReport($startDate, $endDate);
-                break;
-            case 'productivity':
-                $data = $this->getProductivityReport($startDate, $endDate);
-                break;
-            default:
-                $data = $this->getDashboardStats($startDate, $endDate);
+        try {
+            $where = ["DATE(a.created_at) BETWEEN ? AND ?"];
+            $params = [$startDate, $endDate];
+            
+            if (!empty($type)) {
+                $where[] = "a.type = ?";
+                $params[] = $type;
+            }
+            
+            if (!empty($status)) {
+                $where[] = "a.status = ?";
+                $params[] = $status;
+            }
+            
+            $whereClause = 'WHERE ' . implode(' AND ', $where);
+            
+            // Resumen de solicitudes
+            $stmt = $this->db->prepare("
+                SELECT 
+                    COUNT(*) as total_applications,
+                    a.type,
+                    a.status,
+                    COUNT(DISTINCT a.created_by) as unique_creators
+                FROM applications a
+                $whereClause
+                GROUP BY a.type, a.status
+            ");
+            $stmt->execute($params);
+            $summary = $stmt->fetchAll();
+            
+            // Resumen financiero
+            $stmt = $this->db->prepare("
+                SELECT 
+                    SUM(fs.total_costs) as total_costs,
+                    SUM(fs.total_paid) as total_paid,
+                    SUM(fs.balance) as total_balance,
+                    COUNT(CASE WHEN fs.status = ? THEN 1 END) as pagado_count,
+                    COUNT(CASE WHEN fs.status = ? THEN 1 END) as parcial_count,
+                    COUNT(CASE WHEN fs.status = ? THEN 1 END) as pendiente_count
+                FROM financial_status fs
+                JOIN applications a ON fs.application_id = a.id
+                $whereClause
+            ");
+            $stmt->execute([FINANCIAL_PAGADO, FINANCIAL_PARCIAL, FINANCIAL_PENDIENTE, ...$params]);
+            $financial = $stmt->fetch();
+
+            // Control de Ingresos V3: sólo pagos validados por Gerencia.
+            $cashFlow = [
+                'cash' => 0.0,
+                'transfer' => 0.0,
+                'terminal' => 0.0,
+                'income' => 0.0,
+                'expenses' => 0.0,
+                'net' => 0.0,
+                'sales_amount' => 0.0,
+                'sales_count' => 0,
+                'receivables' => 0.0,
+                'pending_validation' => 0.0,
+            ];
+            try {
+                $stmt = $this->db->prepare("
+                    SELECT
+                        COALESCE(SUM(CASE WHEN payment_method='EFECTIVO' THEN amount ELSE 0 END),0) AS cash,
+                        COALESCE(SUM(CASE WHEN payment_method='TRANSFERENCIA' THEN amount ELSE 0 END),0) AS transfer,
+                        COALESCE(SUM(CASE WHEN payment_method='TERMINAL_TARJETA' THEN amount ELSE 0 END),0) AS terminal,
+                        COALESCE(SUM(amount),0) AS income
+                    FROM income_payments
+                    WHERE validation_status='VALIDADO'
+                      AND payment_method IN ('EFECTIVO','TRANSFERENCIA','TERMINAL_TARJETA')
+                      AND payment_date BETWEEN ? AND ?
+                ");
+                $stmt->execute([$startDate, $endDate]);
+                $incomePeriod = $stmt->fetch() ?: [];
+                $cashFlow['cash'] = (float)($incomePeriod['cash'] ?? 0);
+                $cashFlow['transfer'] = (float)($incomePeriod['transfer'] ?? 0);
+                $cashFlow['terminal'] = (float)($incomePeriod['terminal'] ?? 0);
+                $cashFlow['income'] = (float)($incomePeriod['income'] ?? 0);
+
+                $stmt=$this->db->prepare("
+                    SELECT COALESCE(SUM(amount),0)
+                    FROM financial_expenses
+                    WHERE expense_date BETWEEN ? AND ?
+                ");
+                $stmt->execute([$startDate,$endDate]);
+                $cashFlow['expenses']=(float)$stmt->fetchColumn();
+                $cashFlow['net']=$cashFlow['income']-$cashFlow['expenses'];
+
+                $stmt = $this->db->prepare("
+                    SELECT COUNT(*) AS sales_count, COALESCE(SUM(total_amount),0) AS sales_amount
+                    FROM income_sales
+                    WHERE approval_status='VALIDADA'
+                      AND financial_status<>'CANCELADO'
+                      AND contract_date BETWEEN ? AND ?
+                ");
+                $stmt->execute([$startDate,$endDate]);
+                $salesPeriod=$stmt->fetch() ?: [];
+                $cashFlow['sales_count']=(int)($salesPeriod['sales_count']??0);
+                $cashFlow['sales_amount']=(float)($salesPeriod['sales_amount']??0);
+
+                $stmt=$this->db->query("
+                    SELECT COALESCE(SUM(x.balance),0) total
+                    FROM (
+                      SELECT s.id,
+                        s.total_amount-COALESCE(SUM(CASE WHEN p.validation_status='VALIDADO' THEN p.amount ELSE 0 END),0) balance
+                      FROM income_sales s
+                      LEFT JOIN income_payments p ON p.sale_id=s.id
+                      WHERE s.approval_status='VALIDADA' AND s.financial_status<>'CANCELADO'
+                      GROUP BY s.id
+                      HAVING balance>0
+                    ) x
+                ");
+                $cashFlow['receivables']=(float)($stmt->fetch()['total']??0);
+
+                $stmt=$this->db->prepare("
+                    SELECT COALESCE(SUM(amount),0) total
+                    FROM income_payments
+                    WHERE validation_status='PENDIENTE'
+                      AND payment_date BETWEEN ? AND ?
+                ");
+                $stmt->execute([$startDate,$endDate]);
+                $cashFlow['pending_validation']=(float)($stmt->fetch()['total']??0);
+            } catch (PDOException $e) {
+                error_log('Estadística Control de Ingresos V3 no disponible: ' . $e->getMessage());
+            }
+
+            // Top asesores
+            $stmt = $this->db->prepare("
+                SELECT 
+                    u.full_name,
+                    COUNT(a.id) as total_applications,
+                    SUM(CASE WHEN a.status = ? THEN 1 ELSE 0 END) as finalizadas
+                FROM applications a
+                JOIN users u ON a.created_by = u.id
+                $whereClause
+                GROUP BY u.id, u.full_name
+                ORDER BY total_applications DESC
+                LIMIT 10
+            ");
+            $stmt->execute([STATUS_FINALIZADO, ...$params]);
+            $topAdvisors = $stmt->fetchAll();
+            
+            // Solicitudes por día
+            $stmt = $this->db->prepare("
+                SELECT 
+                    DATE(a.created_at) as date,
+                    COUNT(*) as count
+                FROM applications a
+                $whereClause
+                GROUP BY DATE(a.created_at)
+                ORDER BY date ASC
+            ");
+            $stmt->execute($params);
+            $byDay = $stmt->fetchAll();
+            
+            $this->view('reports/index', [
+                'summary' => $summary,
+                'financial' => $financial,
+                'cashFlow' => $cashFlow,
+                'topAdvisors' => $topAdvisors,
+                'byDay' => $byDay,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'type' => $type,
+                'status' => $status
+            ]);
+            
+        } catch (PDOException $e) {
+            error_log("Error al generar reporte: " . $e->getMessage());
+            $_SESSION['error'] = 'Error al generar reporte';
+            $this->view('reports/index', []);
         }
-        
-        $this->view('reports/index', [
-            'reportType' => $reportType,
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'data' => $data
-        ]);
-    }
-    
-    private function getDashboardStats($startDate, $endDate) {
-        $stats = [];
-        
-        // Requests by status
-        $stmt = $this->db->prepare("
-            SELECT status, COUNT(*) as count
-            FROM service_requests
-            WHERE created_at BETWEEN ? AND ?
-            GROUP BY status
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        $stats['requestsByStatus'] = $stmt->fetchAll();
-        
-        // Revenue trend
-        $stmt = $this->db->prepare("
-            SELECT DATE(transaction_date) as date, SUM(amount) as total
-            FROM financial_transactions
-            WHERE transaction_type = 'income' AND transaction_date BETWEEN ? AND ?
-            GROUP BY DATE(transaction_date)
-            ORDER BY date
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        $stats['revenueTrend'] = $stmt->fetchAll();
-        
-        return $stats;
-    }
-    
-    private function getRequestsReport($startDate, $endDate) {
-        $stmt = $this->db->prepare("
-            SELECT sr.*, c.first_name, c.last_name, vs.name as service_name, u.full_name as assigned_name
-            FROM service_requests sr
-            LEFT JOIN clients c ON sr.client_id = c.id
-            LEFT JOIN visa_services vs ON sr.service_id = vs.id
-            LEFT JOIN users u ON sr.assigned_to = u.id
-            WHERE sr.created_at BETWEEN ? AND ?
-            ORDER BY sr.created_at DESC
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        return $stmt->fetchAll();
-    }
-    
-    private function getFinancialReport($startDate, $endDate) {
-        $stmt = $this->db->prepare("
-            SELECT ft.*, fc.name as category_name
-            FROM financial_transactions ft
-            LEFT JOIN financial_categories fc ON ft.category_id = fc.id
-            WHERE ft.transaction_date BETWEEN ? AND ?
-            ORDER BY ft.transaction_date DESC
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        return $stmt->fetchAll();
-    }
-    
-    private function getProductivityReport($startDate, $endDate) {
-        $stmt = $this->db->prepare("
-            SELECT u.full_name, u.role,
-                   COUNT(sr.id) as total_requests,
-                   SUM(CASE WHEN sr.status = 'completed' THEN 1 ELSE 0 END) as completed_requests
-            FROM users u
-            LEFT JOIN service_requests sr ON u.id = sr.assigned_to 
-                AND sr.created_at BETWEEN ? AND ?
-            WHERE u.role IN ('asesor', 'supervisor')
-            GROUP BY u.id, u.full_name, u.role
-            ORDER BY total_requests DESC
-        ");
-        $stmt->execute([$startDate, $endDate]);
-        return $stmt->fetchAll();
     }
     
     public function export() {
-        $reportType = $_GET['type'] ?? 'requests';
-        $startDate = $_GET['start_date'] ?? date('Y-m-01');
-        $endDate = $_GET['end_date'] ?? date('Y-m-t');
+        $this->requireRole([ROLE_ADMIN, ROLE_GERENTE]);
+        
         $format = $_GET['format'] ?? 'csv';
+        $startDate = $_GET['start_date'] ?? date('Y-m-01');
+        $endDate = $_GET['end_date'] ?? date('Y-m-d');
+        $type = $_GET['type'] ?? '';
+        $status = $_GET['status'] ?? '';
         
-        // Get data based on report type
-        $data = [];
-        $filename = '';
-        $headers = [];
-        
-        switch ($reportType) {
-            case 'requests':
-                $data = $this->getRequestsReport($startDate, $endDate);
-                $filename = 'reporte_solicitudes_' . date('Y-m-d');
-                $headers = ['Número', 'Cliente', 'Servicio', 'Estado', 'Prioridad', 'Asignado a', 'Fecha Creación'];
-                break;
-            case 'financial':
-                $data = $this->getFinancialReport($startDate, $endDate);
-                $filename = 'reporte_financiero_' . date('Y-m-d');
-                $headers = ['Fecha', 'Tipo', 'Categoría', 'Descripción', 'Monto', 'Referencia'];
-                break;
-            case 'productivity':
-                $data = $this->getProductivityReport($startDate, $endDate);
-                $filename = 'reporte_productividad_' . date('Y-m-d');
-                $headers = ['Asesor', 'Rol', 'Total Solicitudes', 'Completadas', 'Tasa de Éxito (%)'];
-                break;
-            default:
-                $_SESSION['error'] = 'Tipo de reporte no válido';
-                $this->redirect(BASE_URL . '/public/index.php?page=reports');
-                return;
-        }
-        
-        if ($format === 'csv') {
-            $this->exportToCSV($data, $headers, $filename, $reportType);
-        } else {
-            $_SESSION['error'] = 'Formato de exportación no soportado';
-            $this->redirect(BASE_URL . '/public/index.php?page=reports');
+        try {
+            $where = ["DATE(a.created_at) BETWEEN ? AND ?"];
+            $params = [$startDate, $endDate];
+            
+            if (!empty($type)) {
+                $where[] = "a.type = ?";
+                $params[] = $type;
+            }
+            
+            if (!empty($status)) {
+                $where[] = "a.status = ?";
+                $params[] = $status;
+            }
+            
+            $whereClause = 'WHERE ' . implode(' AND ', $where);
+            
+            // Obtener datos
+            $stmt = $this->db->prepare("
+                SELECT 
+                    a.folio,
+                    a.type,
+                    a.subtype,
+                    a.status,
+                    u.full_name as creator_name,
+                    a.created_at,
+                    fs.total_costs,
+                    fs.total_paid,
+                    fs.balance,
+                    fs.status as financial_status
+                FROM applications a
+                LEFT JOIN users u ON a.created_by = u.id
+                LEFT JOIN financial_status fs ON a.id = fs.application_id
+                $whereClause
+                ORDER BY a.created_at DESC
+            ");
+            $stmt->execute($params);
+            $data = $stmt->fetchAll();
+            
+            if ($format === 'csv') {
+                $this->exportCSV($data, $startDate, $endDate);
+            } elseif ($format === 'excel') {
+                $this->exportExcel($data, $startDate, $endDate);
+            } else {
+                $_SESSION['error'] = 'Formato de exportación no soportado';
+                $this->redirect('/reportes');
+            }
+            
+        } catch (PDOException $e) {
+            error_log("Error al exportar: " . $e->getMessage());
+            $_SESSION['error'] = 'Error al exportar datos';
+            $this->redirect('/reportes');
         }
     }
     
-    private function exportToCSV($data, $headers, $filename, $reportType) {
-        // Set headers for download
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '.csv"');
-        header('Pragma: no-cache');
-        header('Expires: 0');
+    private function exportCSV($data, $startDate, $endDate) {
+        $filename = "reporte_solicitudes_{$startDate}_a_{$endDate}.csv";
         
-        // Open output stream
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        
         $output = fopen('php://output', 'w');
         
-        // Add BOM for UTF-8 encoding (helps with Excel)
+        // BOM para Excel UTF-8
         fprintf($output, chr(0xEF).chr(0xBB).chr(0xBF));
         
-        // Write headers
-        fputcsv($output, $headers);
+        // Encabezados
+        fputcsv($output, [
+            'Folio',
+            'Tipo',
+            'Subtipo',
+            'Estatus',
+            'Creado por',
+            'Fecha creación',
+            'Total costos',
+            'Total pagado',
+            'Saldo',
+            'Estado financiero'
+        ]);
         
-        // Write data
+        // Datos
         foreach ($data as $row) {
-            $csvRow = [];
-            
-            switch ($reportType) {
-                case 'requests':
-                    $csvRow = [
-                        $row['request_number'],
-                        $row['first_name'] . ' ' . $row['last_name'],
-                        $row['service_name'],
-                        ucfirst($row['status']),
-                        ucfirst($row['priority']),
-                        $row['assigned_name'] ?? 'Sin asignar',
-                        date('d/m/Y H:i', strtotime($row['created_at']))
-                    ];
-                    break;
-                case 'financial':
-                    $csvRow = [
-                        date('d/m/Y', strtotime($row['transaction_date'])),
-                        ucfirst($row['transaction_type']),
-                        $row['category_name'] ?? 'Sin categoría',
-                        $row['description'],
-                        number_format($row['amount'], 2),
-                        $row['reference'] ?? ''
-                    ];
-                    break;
-                case 'productivity':
-                    $rate = $row['total_requests'] > 0 ? 
-                            ($row['completed_requests'] / $row['total_requests'] * 100) : 0;
-                    $csvRow = [
-                        $row['full_name'],
-                        ucfirst($row['role']),
-                        $row['total_requests'],
-                        $row['completed_requests'],
-                        number_format($rate, 2)
-                    ];
-                    break;
-            }
-            
-            fputcsv($output, $csvRow);
+            fputcsv($output, [
+                $row['folio'],
+                $row['type'],
+                $row['subtype'] ?? '-',
+                $row['status'],
+                $row['creator_name'],
+                date('d/m/Y H:i', strtotime($row['created_at'])),
+                '$' . number_format($row['total_costs'] ?? 0, 2),
+                '$' . number_format($row['total_paid'] ?? 0, 2),
+                '$' . number_format($row['balance'] ?? 0, 2),
+                $row['financial_status'] ?? '-'
+            ]);
         }
         
         fclose($output);
+        exit;
+    }
+    
+    private function exportExcel($data, $startDate, $endDate) {
+        // Exportación simple en formato HTML que Excel puede abrir
+        $filename = "reporte_solicitudes_{$startDate}_a_{$endDate}.xls";
+        
+        header('Content-Type: application/vnd.ms-excel; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        
+        echo '<html><head><meta charset="UTF-8"></head><body>';
+        echo '<table border="1">';
+        echo '<tr style="background-color: #3b82f6; color: white; font-weight: bold;">';
+        echo '<th>Folio</th>';
+        echo '<th>Tipo</th>';
+        echo '<th>Subtipo</th>';
+        echo '<th>Estatus</th>';
+        echo '<th>Creado por</th>';
+        echo '<th>Fecha creación</th>';
+        echo '<th>Total costos</th>';
+        echo '<th>Total pagado</th>';
+        echo '<th>Saldo</th>';
+        echo '<th>Estado financiero</th>';
+        echo '</tr>';
+        
+        foreach ($data as $row) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($row['folio']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['type']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['subtype'] ?? '-') . '</td>';
+            echo '<td>' . htmlspecialchars($row['status']) . '</td>';
+            echo '<td>' . htmlspecialchars($row['creator_name']) . '</td>';
+            echo '<td>' . date('d/m/Y H:i', strtotime($row['created_at'])) . '</td>';
+            echo '<td>$' . number_format($row['total_costs'] ?? 0, 2) . '</td>';
+            echo '<td>$' . number_format($row['total_paid'] ?? 0, 2) . '</td>';
+            echo '<td>$' . number_format($row['balance'] ?? 0, 2) . '</td>';
+            echo '<td>' . htmlspecialchars($row['financial_status'] ?? '-') . '</td>';
+            echo '</tr>';
+        }
+        
+        echo '</table>';
+        echo '</body></html>';
         exit;
     }
 }

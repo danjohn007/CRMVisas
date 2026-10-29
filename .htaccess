@@ -1,45 +1,62 @@
-# Enable Rewrite Engine
+# Habilitar reescritura de URL
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /
     
-    # Redirect to HTTPS (optional - uncomment if using SSL)
-    # RewriteCond %{HTTPS} off
-    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # Establecer el directorio base
+    RewriteBase /intranet/
+
+    RewriteRule ^(?:app|config|database|vendor)(?:/|$) - [F,L,NC]
+    RewriteRule ^(?:composer\.(?:json|lock)|error\.log|test_connection\.php|.*\.md)$ - [F,L,NC]
+
+    RewriteCond %{DOCUMENT_ROOT}/intranet/public/$1 -f [OR]
+    RewriteCond %{DOCUMENT_ROOT}/intranet/public/$1 -d
+    RewriteRule ^(.+)$ public/$1 [L]
     
-    # Prevent access to hidden files and directories
-    RewriteRule "(^|/)\." - [F]
+    # Si el archivo o directorio existe, mostrarlo directamente
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     
-    # Prevent direct access to sensitive files
-    <FilesMatch "^\.">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
-    
-    # Protect config files
-    <FilesMatch "(config\.php|database\.php)$">
-        Order allow,deny
-        Deny from all
-    </FilesMatch>
+    # Redirigir todas las solicitudes a public/index.php
+    RewriteRule ^(.*)$ public/index.php [QSA,L]
 </IfModule>
 
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set X-XSS-Protection "1; mode=block"
-</IfModule>
-
-# Disable directory browsing
+# Prevenir listado de directorios
 Options -Indexes
+DirectoryIndex public/index.php
 
-# Default index files
-DirectoryIndex index.php index.html
+# Deshabilitar el acceso a archivos sensibles
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 
-# PHP settings
-<IfModule mod_php7.c>
-    php_value upload_max_filesize 10M
-    php_value post_max_size 10M
-    php_value max_execution_time 300
-    php_value max_input_time 300
+# Proteger archivos de configuración
+<FilesMatch "(config\.php|database\.php|\.sql)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Configurar tipos MIME
+AddType application/x-httpd-php .php
+
+# Habilitar compresión
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options SAMEORIGIN
+    Header always set Referrer-Policy strict-origin-when-cross-origin
+</IfModule>
+
+# Cache para archivos estáticos
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
 </IfModule>

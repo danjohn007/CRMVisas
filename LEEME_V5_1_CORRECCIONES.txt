@@ -1,0 +1,136 @@
+CRM VISAS V5.1 - SIMPLIFICACIÓN Y CORRECCIONES FINANCIERAS
+============================================================
+
+CAMBIOS PRINCIPALES
+-------------------
+
+ASESORA
+1. HOJA DE INFORMACIÓN
+   - DHL/Mensajería NO fue creado por V5: ya existía históricamente en la tabla.
+     En V5.1 se oculta de la captura principal para simplificarla.
+   - La asesora YA NO selecciona el servicio.
+   - El sistema toma automáticamente el trámite desde la Solicitud/Formulario.
+   - El precio unitario se toma primero del costo del formulario.
+   - Si el formulario tiene costo 0, se utiliza el precio autorizado del catálogo
+     cuando existe una correspondencia.
+   - La asesora sólo indica Cantidad de solicitantes.
+   - Total = precio unitario x cantidad, calculado por servidor.
+   - Se mantienen únicamente Efectivo, Terminal y Transferencia.
+   - Se puede adjuntar comprobante por cada forma de pago.
+   - Gerencia puede abrir esos comprobantes antes de aprobar.
+   - Se sigue generando Nota de Remisión.
+
+2. VENTAS MANUALES
+   - Para cliente nuevo sólo se pide NOMBRE.
+   - Teléfono y correo dejan de solicitarse.
+   - Se agregó buscador por nombre antes de la lista de clientes.
+   - Copias, actas, impresiones y servicios rápidos siguen registrándose aquí.
+
+3. VENTAS POR QUINCENA
+   - Se eliminó la vista agrupada/desplegable confusa.
+   - Ahora se muestra una sola TABLA con:
+     Fecha, Cliente, Folio, Servicio, Cantidad y Total.
+   - Se conserva filtro Desde/Hasta.
+   - Se conserva Horas extra en una sección simple debajo.
+   - Administrador y Gerente pueden usar la misma vista para consultar a todas
+     las asesoras o filtrar una en específico.
+
+GERENCIA / ADMINISTRACIÓN
+4. CONTROL DE INGRESOS
+   - Los comprobantes de Hoja de Información ahora sí quedan ligados a los pagos.
+   - Se muestra "Ver comprobante" o "Sin comprobante adjunto".
+
+5. BALANCE SEMANAL
+   - Se simplificó.
+   - Sólo deja:
+     Ingresos validados
+     Egresos
+     Resultado semanal
+     Efectivo/Ahorro
+     Terminal
+     Transferencia
+     Tabla única de movimientos
+     Cierre semanal
+   - Continúa bloqueando el cierre antes del viernes.
+   - Continúa bloqueando cierre con pagos/ventas pendientes.
+
+6. RESUMEN MENSUAL
+   - Tabla única por servicio.
+   - Muestra Servicio / Cantidad / Total vendido.
+   - Cada renglón abre su detalle dentro de la misma tabla:
+     Fecha, Cliente, Folio, Asesora, Cantidad, Total.
+   - Nueva sección de ahorro:
+     Ahorro al cierre del mes anterior
+     + Efectivo recibido
+     - Egresos
+     = Ahorro acumulado
+   - Terminal y Transferencia se muestran por separado.
+
+ADMINISTRADOR
+7. EGRESOS
+   - Administrador y Gerente pueden registrar egresos.
+   - Continúan descontándose sólo de Efectivo.
+
+8. VENTAS Y HORAS EXTRA DE ASESORAS
+   - Nuevo acceso de menú "Ventas de asesoras".
+   - Usa la misma vista /ventas-quincenales.
+   - Admin/Gerente pueden filtrar por asesora.
+   - Las asesoras sólo ven su información.
+
+REINICIO FINANCIERO
+-------------------
+Archivo:
+database/maintenance/12_reiniciar_finanzas_pruebas_V5_1_SIN_TOCAR_FORMULARIOS.sql
+
+Este SQL limpia:
+- Ventas.
+- Pagos.
+- Movimientos de cuentas.
+- Egresos.
+- Cierres semanales.
+- Horas extra.
+- Clientes rápidos.
+- Registros financieros legacy.
+- Parte financiera de Hoja de Información.
+
+NO TOCA:
+- forms
+- public_form_submissions
+- applications
+- documents
+- form_links
+- conversaciones/bot
+- usuarios
+- income_catalog
+
+IMPORTANTE
+----------
+Hacer respaldo de la base antes de ejecutar el reinicio financiero.
+
+ORDEN DE INSTALACIÓN
+--------------------
+Si ya está instalada V5.0.2/V5.0.3:
+1. Respaldar archivos y BD.
+2. Subir el ZIP V5.1 y reemplazar archivos.
+3. Si se quiere repetir TODO el ejercicio financiero desde cero:
+   ejecutar 12_reiniciar_finanzas_pruebas_V5_1_SIN_TOCAR_FORMULARIOS.sql
+4. Cerrar sesión y volver a entrar.
+5. No requiere Firebase.
+6. No requiere una migración de estructura adicional.
+
+PRUEBA RECOMENDADA
+------------------
+1. Entrar como Asesora.
+2. Abrir una Solicitud existente.
+3. Hoja de Información debe mostrar el trámite automáticamente.
+4. Cambiar Cantidad a 2:
+   el total debe duplicarse automáticamente.
+5. Registrar pago dividido entre Efectivo/Terminal/Transferencia y adjuntar
+   comprobante donde corresponda.
+6. Guardar y revisar Nota de Remisión.
+7. Entrar como Gerente/Admin a Control de Ingresos.
+8. Ver comprobante y aprobar.
+9. Revisar Balance Semanal.
+10. Registrar un egreso desde Gerente o Admin.
+11. Revisar Resumen Mensual y el ahorro anterior/actual.
+12. Revisar Ventas de asesoras y horas extra.
